@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(mkdir -p /c/Users/Admin/.claude/skills)",
+      "Bash(cp -r /c/Users/Admin/AppData/Local/Temp/taste-skill/skills/minimalist-skill /c/Users/Admin/.claude/skills/)",
+      "Bash(cp -r /c/Users/Admin/AppData/Local/Temp/taste-skill/skills/soft-skill /c/Users/Admin/.claude/skills/)",
+      "Bash(npx --yes create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --no-git --use-npm --yes)"
+    ]
+  }
+}
