@@ -34,7 +34,7 @@ export default function Contactus() {
               alt="Sculpted marble portrait of Syed Aayan Ahmed"
               width={1032}
               height={1328}
-              caption="—"
+              caption="MMXXVI"
               figureLabel="fig. ii"
               variant="niche"
             />

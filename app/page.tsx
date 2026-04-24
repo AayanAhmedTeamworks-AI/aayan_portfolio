@@ -1,4 +1,5 @@
 import { FrontispieceBust } from "@/components/frontispiece-bust";
+import { BustShadow } from "@/components/bust-shadow";
 import { Reveal } from "@/components/reveal";
 import { Meander } from "@/components/meander";
 import { VTLink } from "@/components/vt-link";
@@ -54,6 +55,9 @@ export default function Home() {
       >
         {/* Bust relief + dust — one R3F canvas, full-bleed, absolute */}
         <FrontispieceBust />
+
+        {/* Directional cast shadow from the key light onto the text column */}
+        <BustShadow />
 
         {/* Ambient warm wash */}
         <div className="ambient-glow" />
