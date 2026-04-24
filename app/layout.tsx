@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
+import { MeanderLoader } from "@/components/meander-loader";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable} ${cormorant.variable}`}
     >
       <body className="min-h-dvh bg-canvas text-ink font-sans antialiased grain-overlay">
+        <MeanderLoader />
         <Nav />
         {children}
         <Footer />
