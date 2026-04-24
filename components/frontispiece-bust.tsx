@@ -2,6 +2,13 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, Environment, useGLTF } from "@react-three/drei";
+import {
+  Bloom,
+  EffectComposer,
+  N8AO,
+  Noise,
+  Vignette,
+} from "@react-three/postprocessing";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
@@ -142,10 +149,11 @@ export function FrontispieceBust() {
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
+          outputColorSpace: THREE.SRGBColorSpace,
         }}
         style={{ position: "absolute", inset: 0 }}
       >
-        {/* Museum lighting */}
+        {/* Museum lighting — HDRI provides IBL, directionals carry the drama */}
         <ambientLight intensity={0.4} color="#f5efe3" />
         <directionalLight
           position={[4, 5, 4]}
@@ -159,13 +167,29 @@ export function FrontispieceBust() {
         />
         <pointLight position={[0, -3, 3]} intensity={0.5} color="#8b6b3f" />
 
-        {/* Studio HDRI for subtle reflections on the marble */}
-        <Environment preset="studio" background={false} />
+        {/* Museum HDRI — Adams Place Bridge (Poly Haven, CC0) — IBL only, no skybox */}
+        <Environment
+          files="/hdri/adams_place_bridge_1k.hdr"
+          background={false}
+        />
 
         <Suspense fallback={null}>
           <Bust />
           <Dust />
         </Suspense>
+
+        {/* Post pipeline — N8AO settles the bust into space, Bloom kisses
+            highlights, Vignette frames, Noise kills banding on the gradient. */}
+        <EffectComposer multisampling={0} enableNormalPass>
+          <N8AO aoRadius={0.5} intensity={2} />
+          <Bloom
+            intensity={0.18}
+            luminanceThreshold={0.82}
+            mipmapBlur
+          />
+          <Vignette offset={0.35} darkness={0.6} eskil={false} />
+          <Noise opacity={0.025} premultiply={false} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
