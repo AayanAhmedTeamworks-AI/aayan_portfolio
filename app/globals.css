@@ -116,6 +116,45 @@
   background-size: 200px 200px;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Fly-by dust — CSS-only keyframes, one animation for all 12 spans.
+   Each particle's start/end/duration/delay/peak opacity is supplied
+   via CSS custom properties written once at mount from DustLayer.
+   Zero per-frame JS. Composited by the browser.
+   ══════════════════════════════════════════════════════════════ */
+@keyframes dust-drift {
+  0% {
+    transform: translate3d(var(--sx, 50vw), var(--sy, 50vh), 0);
+    opacity: 0;
+  }
+  18%,
+  82% {
+    opacity: var(--peak, 0.08);
+  }
+  100% {
+    transform: translate3d(var(--ex, 50vw), var(--ey, 50vh), 0);
+    opacity: 0;
+  }
+}
+
+.dust-particle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(201, 163, 114, 0.9) 0%,
+    transparent 66%
+  );
+  opacity: 0;
+  animation: dust-drift var(--dur, 60s) var(--delay, 0s) infinite ease-in-out;
+  will-change: transform, opacity;
+}
+
 /* Very slow, very subtle warm glow behind frontispiece — adds depth, not spectacle */
 .ambient-glow {
   position: absolute;
