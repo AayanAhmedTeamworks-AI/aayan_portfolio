@@ -1,0 +1,101 @@
+import { CaseHeader } from "@/components/case-header";
+import { StatGrid, Stat } from "@/components/stat";
+import { PullQuote } from "@/components/pull-quote";
+import { ArrowCTA } from "@/components/arrow-cta";
+
+export const metadata = {
+  title: "Bautagesbericht Pro — Codex Ahmed",
+  description:
+    "An offline-first construction daily-reporting PWA with a German voice-agent. Seven languages, three roles, 15 kLOC. Teamworks AI × Baumann GmbH.",
+};
+
+<div className="max-w-[90rem] mx-auto px-8 md:px-16">
+
+<CaseHeader
+  chapter="I · Praxis · i"
+  client="Baumann GmbH · via Teamworks AI"
+  year="2025 — 2026"
+  role="Lead front-end engineer, partial back-end"
+  stack="React 18 · TypeScript 5.9 · Vite · Supabase · Workbox · i18next · Fonio.ai"
+  title="Bautagesbericht Pro"
+  tagline="An offline-first construction daily-reporting PWA with a German voice-agent that turns a 15-minute form into a 4-minute phone call."
+/>
+
+<div className="max-w-4xl">
+
+## The brief
+
+In the German construction industry the *Bautagesbericht* is a legally-weighty daily log of site activity, weather, personnel, materials, and incidents. It is overwhelmingly still written by hand or in Excel at the end of a long shift — a workflow that is slow, error-prone, and essentially unqueryable.
+
+Baumann GmbH, a mid-sized construction firm, asked us to replace that workflow with something a foreman could actually use in the cold, with muddy gloves, on a dying phone battery and a marginal LTE signal.
+
+## What we shipped
+
+A Progressive Web App that works offline first, speaks seven languages, and — most usefully — can be bypassed entirely in favour of a phone call.
+
+<StatGrid>
+  <Stat value="15 kLOC" label="TypeScript shipped" />
+  <Stat value="7" label="Languages (with RTL)" />
+  <Stat value="3" label="Role tiers" />
+  <Stat value="4–6 min" label="Report by phone call" />
+</StatGrid>
+
+## Offline-first, not offline-tolerant
+
+Construction sites lose connectivity often enough that "graceful offline" isn't a feature — it's the design centre. Every write is persisted to IndexedDB (via `idb`) before the UI acknowledges it, queued through a sync manager, and reconciled against Supabase when the network returns. A Workbox service worker handles asset caching and background sync. Each queue entry carries a client-generated UUID so the server can deduplicate retries safely.
+
+A foreman can fill in a report, walk into a tunnel, have the OS kill the tab mid-save, reopen the app an hour later, and find the draft intact.
+
+## The Fonio voice agent
+
+The single most distinctive feature is the *report-by-phone* flow. A foreman either dials a dedicated project number or is called at an agreed time by a German conversational agent provided by [fonio.ai](https://fonio.ai). The agent conducts a structured conversation — site, weather, personnel, work performed, materials, incidents, open to-dos.
+
+At end-of-call, fonio POSTs a webhook to a Supabase Edge Function, which:
+
+1. Identifies the caller by normalized E.164 phone number
+2. Sends the transcript to OpenAI with a strict JSON schema
+3. Writes the extracted report to the database as a draft
+
+The foreman reviews and approves on a phone or tablet the next morning — or the office does it for them.
+
+<PullQuote attribution="Field test, Q1 2026">
+Fifteen minutes of form-driven entry, compressed to a four- to six-minute conversation — without loss of fidelity.
+</PullQuote>
+
+## Roles & row-level security
+
+Three tiers, enforced both client-side and authoritatively by Postgres row-level-security policies on Supabase:
+
+- **Laborer** — submits reports, voice-first UI, minimal chrome.
+- **Foreman** — reviews, approves, edits.
+- **Manager** — analytics, administration, exports.
+
+A missing RLS policy on a protected column now fails a pre-commit lint pass; it's not a code-review concern any more.
+
+## Seven languages, no translation drift
+
+Baumann's workforce speaks German, English, Arabic, Turkish, Polish, Romanian, and Croatian — with RTL layout support for Arabic. `i18next` handles the runtime; a pre-commit script walks the source for every `t()` call, collects the keys, and fails the commit if any locale file is missing one. Hard-coded strings are disallowed by code review.
+
+The class of "missing translation" bugs has effectively been extinguished.
+
+## Auxiliary features that paid for themselves
+
+- **Address autocomplete** via a geocoding service.
+- **Barcode scanner** using the native `BarcodeDetector` API with a WASM fallback.
+- **PDF export** with localized templates.
+- **Juracheck** — ambiguous legal-compliance questions get routed to an LLM for triage.
+- **MessageBird / SMTP** notification dispatch.
+
+Each of these is a thin feature; the value is that the app is now the place where the foreman already is, so adding a fifteenth thing costs one morning instead of a project.
+
+## What this project taught me
+
+That *integration is the unit of value*, not invention. The interesting parts of this codebase are not the models or the shaders — they are the pre-commit hooks, the idempotent queues, the role-aware RLS, the webhook deduplication, the localized PDF footer. Nothing glamorous. Everything durable.
+
+<div className="mt-16 flex gap-4">
+  <ArrowCTA href="/praxis">Back to Praxis</ArrowCTA>
+  <ArrowCTA href="/contactus">Get in touch</ArrowCTA>
+</div>
+
+</div>
+</div>
