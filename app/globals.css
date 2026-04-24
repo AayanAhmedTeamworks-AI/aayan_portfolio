@@ -142,13 +142,18 @@
   left: 0;
   top: 0;
   display: block;
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border-radius: 9999px;
+  /* Ink-toned mote with a sharper inner core and a soft outer halo —
+     dark particles read against the warm ivory canvas where same-hue
+     sepia particles blended invisibly. */
   background: radial-gradient(
     circle,
-    rgba(201, 163, 114, 0.9) 0%,
-    transparent 66%
+    rgba(26, 22, 19, 0.95) 0%,
+    rgba(26, 22, 19, 0.55) 14%,
+    rgba(26, 22, 19, 0.18) 38%,
+    transparent 62%
   );
   opacity: 0;
   animation: dust-drift var(--dur, 60s) var(--delay, 0s) infinite ease-in-out;
