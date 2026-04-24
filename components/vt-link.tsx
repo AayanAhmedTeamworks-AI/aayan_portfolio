@@ -1,70 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { ComponentProps, MouseEvent, ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 type Props = ComponentProps<typeof Link> & { children: ReactNode };
 
 /**
- * Drop-in Link replacement. When the browser supports the View Transitions
- * API, interception wraps `router.push` inside `document.startViewTransition`
- * so matching `view-transition-name` elements morph between positions.
- * On browsers without it (Firefox, at time of writing), passes through
- * to next/link — the PageTransition component handles crossfade there.
+ * Thin wrapper over `next/link`. Formerly intercepted clicks and wrapped
+ * `router.push` in `document.startViewTransition` — removed because the
+ * View Transitions API's callback timing model clashes with Next App
+ * Router's async/Suspense-streamed rendering, producing a cascade of
+ * `AbortError`, `InvalidStateError`, and `TimeoutError` DOMExceptions
+ * with no visible morph on the numerals. `PageTransition` handles the
+ * crossfade now, and the `chapter-numeral-*` CSS classes remain in
+ * place as inert markers — ready to re-light if a future setup makes
+ * the morph reliable (React 19 `ViewTransition`, a Next API that
+ * synchronises the router commit, etc.).
  *
- * Manual fallback trigger: append `?no-vt=1` to any URL to force the framer
- * crossfade path even on View-Transition-capable browsers.
+ * Kept as a typed wrapper (not deleted) so existing call-sites don't
+ * need to be migrated back to raw `next/link`.
  */
-export function VTLink({ onClick, children, ...props }: Props) {
-  const router = useRouter();
-
-  const handle = (e: MouseEvent<HTMLAnchorElement>) => {
-    onClick?.(e);
-    if (e.defaultPrevented) return;
-    if (
-      e.metaKey ||
-      e.ctrlKey ||
-      e.shiftKey ||
-      e.altKey ||
-      e.button !== 0
-    )
-      return;
-
-    const href =
-      typeof props.href === "string" ? props.href : props.href?.toString();
-    if (
-      !href ||
-      href.startsWith("http") ||
-      href.startsWith("mailto:") ||
-      href.startsWith("#")
-    )
-      return;
-
-    const hasVT =
-      typeof document !== "undefined" && "startViewTransition" in document;
-    const forceFallback =
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).has("no-vt");
-    if (!hasVT || forceFallback) return;
-
-    e.preventDefault();
-    (
-      document as unknown as {
-        startViewTransition: (cb: () => Promise<void> | void) => void;
-      }
-    ).startViewTransition(async () => {
-      router.push(href);
-      // Two frames give Next.js time to render the destination before the
-      // browser snapshots the "new" state.
-      await new Promise((r) => requestAnimationFrame(r));
-      await new Promise((r) => requestAnimationFrame(r));
-    });
-  };
-
-  return (
-    <Link {...props} onClick={handle}>
-      {children}
-    </Link>
-  );
+export function VTLink({ children, ...props }: Props) {
+  return <Link {...props}>{children}</Link>;
 }

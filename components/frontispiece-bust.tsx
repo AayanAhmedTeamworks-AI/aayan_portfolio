@@ -154,13 +154,14 @@ export function FrontispieceBust() {
 
       <Canvas
         camera={{ position: [0, 0, 4.6], fov: 40 }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
         gl={{
           antialias: true,
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
           outputColorSpace: THREE.SRGBColorSpace,
+          powerPreference: "high-performance",
         }}
         style={{ position: "absolute", inset: 0 }}
       >
@@ -190,14 +191,19 @@ export function FrontispieceBust() {
         </Suspense>
 
         {/* Post pipeline — N8AO settles the bust into space, Bloom kisses
-            highlights, Vignette frames, Noise kills banding on the gradient. */}
+            highlights, Vignette frames, Noise kills banding on the gradient.
+            Tuned for performance: halfRes AO + performance quality + Bloom
+            without mipmapBlur. Same look read at 1–2 metres, materially
+            lower GPU fill cost — bust runs in a continuous useFrame so every
+            shader pass is ×60 per second. */}
         <EffectComposer multisampling={0} enableNormalPass>
-          <N8AO aoRadius={0.5} intensity={2} />
-          <Bloom
-            intensity={0.18}
-            luminanceThreshold={0.82}
-            mipmapBlur
+          <N8AO
+            aoRadius={0.5}
+            intensity={2}
+            halfRes
+            quality="performance"
           />
+          <Bloom intensity={0.18} luminanceThreshold={0.82} />
           <Vignette offset={0.35} darkness={0.6} eskil={false} />
           <Noise opacity={0.025} premultiply={false} />
         </EffectComposer>
