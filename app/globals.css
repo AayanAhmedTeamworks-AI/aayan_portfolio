@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #f5efe3;
+  /* Tier B palette shift — deeper parchment.
+     Tokens dropped ~8–10% lightness, same relative steps preserved,
+     chosen to close the brightness seam between the HDRI/vignette hero
+     and the flat chapter surfaces. Iterate to #ddcfb4 if seam persists. */
+  --color-canvas: #e5d9c2;
   --color-ink: #1a1613;
   --color-sepia: #8b6b3f;
-  --color-marble: #ebe4d7;
-  --color-mute: #78736c;
-  --color-hairline: #e4dccd;
+  --color-marble: #d9cdb4;
+  --color-mute: #6f6a62;
+  --color-hairline: #ccbfa4;
   --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
