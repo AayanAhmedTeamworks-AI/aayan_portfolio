@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { FrontispieceBust } from "@/components/frontispiece-bust";
 import { Reveal } from "@/components/reveal";
 import { Meander } from "@/components/meander";
+import { VTLink } from "@/components/vt-link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 
 const chapters = [
@@ -117,9 +117,11 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20">
           {chapters.map((c, i) => (
             <Reveal key={c.numeral} delay={i * 100}>
-              <Link href={c.slug} className="group block">
+              <VTLink href={c.slug} className="group block">
                 <div className="flex items-baseline gap-6">
-                  <span className="font-serif italic text-sepia/70 text-3xl md:text-4xl tracking-tight">
+                  <span
+                    className={`font-serif italic text-sepia/70 text-3xl md:text-4xl tracking-tight chapter-numeral-${c.numeral.toLowerCase()}`}
+                  >
                     {c.numeral}
                   </span>
                   <h3 className="font-serif text-5xl md:text-[4.5rem] tracking-[-0.03em] leading-none text-ink group-hover:text-sepia transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
@@ -136,7 +138,7 @@ export default function Home() {
                   <span className="h-px bg-hairline flex-1 group-hover:bg-sepia/45 transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" />
                   <ArrowRightIcon size={13} weight="light" />
                 </div>
-              </Link>
+              </VTLink>
             </Reveal>
           ))}
         </div>

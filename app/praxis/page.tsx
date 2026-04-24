@@ -62,7 +62,8 @@ export default function Praxis() {
   return (
     <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
       <ChapterHeading
-        numeral="I · Praxis"
+        numeral="I"
+        chapter="Praxis"
         label="Production work"
         tagline="Shipped systems for firms in the DACH region. Restraint as discipline; integration as the unit of value."
       />

@@ -7,7 +7,8 @@ export default function Contactus() {
   return (
     <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
       <ChapterHeading
-        numeral="IV · Contactus"
+        numeral="IV"
+        chapter="Contactus"
         label="Get in touch"
         tagline="Best reached by email. I reply in English or German. Occasionally slow, always honest."
       />

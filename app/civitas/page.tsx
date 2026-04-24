@@ -25,7 +25,8 @@ export default function Civitas() {
   return (
     <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
       <ChapterHeading
-        numeral="III · Civitas"
+        numeral="III"
+        chapter="Civitas"
         label="Public & social"
         tagline="Work that is not invoiced. The part of a résumé that usually goes in a footnote, here given its own page."
       />

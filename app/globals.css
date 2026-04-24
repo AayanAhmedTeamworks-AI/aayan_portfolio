@@ -45,6 +45,48 @@
   }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   View Transitions — architectural page transitions.
+   Chapter numerals carry a view-transition-name via a class; the
+   browser morphs them between their index-card position on `/` and
+   their <h1> position on the chapter page. Everything else crossfades
+   under the root group. Firefox has no runtime effect from these
+   rules — the PageTransition component handles that case with
+   framer-motion.
+   ══════════════════════════════════════════════════════════════ */
+@view-transition {
+  navigation: auto;
+}
+
+/* Default root crossfade — matches Lenis / Reveal ease, tuned short */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Named numerals — longer, more noticeable travel */
+.chapter-numeral-i {
+  view-transition-name: chapter-numeral-i;
+}
+.chapter-numeral-ii {
+  view-transition-name: chapter-numeral-ii;
+}
+.chapter-numeral-iii {
+  view-transition-name: chapter-numeral-iii;
+}
+.chapter-numeral-iv {
+  view-transition-name: chapter-numeral-iv;
+}
+
+::view-transition-group(chapter-numeral-i),
+::view-transition-group(chapter-numeral-ii),
+::view-transition-group(chapter-numeral-iii),
+::view-transition-group(chapter-numeral-iv) {
+  animation-duration: 560ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* Fine film grain — adds tactile depth without distracting */
 /* Hide OS cursor in favour of the custom one — only on fine-pointer devices.
    Inputs/textareas/contenteditable keep a text cursor for usability. */

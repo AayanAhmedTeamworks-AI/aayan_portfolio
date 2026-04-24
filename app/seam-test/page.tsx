@@ -43,7 +43,8 @@ export default function SeamTestPage() {
 
       <section className="relative mx-auto max-w-[90rem] px-8 pt-24 pb-24 md:px-16">
         <ChapterHeading
-          numeral="— · Test"
+          numeral="—"
+          chapter="Test"
           label="Chapter surface"
           tagline="Plain canvas. No vignette, no post stack. This is what every non-hero page renders."
         />

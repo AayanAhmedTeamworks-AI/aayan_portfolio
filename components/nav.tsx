@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VTLink } from "./vt-link";
 
 const items = [
   { label: "Praxis", numeral: "I", href: "/praxis" },
@@ -20,7 +21,7 @@ export function Nav() {
         <ul className="hidden md:flex items-center gap-8 lg:gap-10">
           {items.map((it) => (
             <li key={it.href}>
-              <Link
+              <VTLink
                 href={it.href}
                 className="group flex items-baseline gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-mute hover:text-ink transition-colors duration-300"
               >
@@ -28,7 +29,7 @@ export function Nav() {
                   {it.numeral}
                 </span>
                 <span>{it.label}</span>
-              </Link>
+              </VTLink>
             </li>
           ))}
         </ul>

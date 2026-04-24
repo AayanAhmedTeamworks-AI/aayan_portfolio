@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Meander } from "./meander";
+import { VTLink } from "./vt-link";
 
 const chapters = [
   { n: "I", l: "Praxis", h: "/praxis" },
@@ -31,7 +32,7 @@ export function Footer() {
             <ul className="space-y-2.5">
               {chapters.map((c) => (
                 <li key={c.h}>
-                  <Link
+                  <VTLink
                     href={c.h}
                     className="font-serif text-lg text-ink/85 hover:text-sepia transition-colors duration-300"
                   >
@@ -39,7 +40,7 @@ export function Footer() {
                       {c.n}
                     </span>
                     {c.l}
-                  </Link>
+                  </VTLink>
                 </li>
               ))}
             </ul>
