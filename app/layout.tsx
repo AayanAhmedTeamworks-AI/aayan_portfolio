@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer";
 import { MeanderLoader } from "@/components/meander-loader";
 import { LenisRoot } from "@/components/lenis-root";
 import { Cursor } from "@/components/cursor";
+import { DustLayer } from "@/components/dust-layer";
 import { PageTransition } from "@/components/page-transition";
 
 const cormorant = Cormorant_Garamond({
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-canvas text-ink font-sans antialiased grain-overlay">
         <LenisRoot>
           <Cursor />
+          <DustLayer />
           <MeanderLoader />
           <Nav />
           <PageTransition>{children}</PageTransition>
