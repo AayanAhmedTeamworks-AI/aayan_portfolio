@@ -34,7 +34,12 @@ export default function Civitas() {
       <div className="mt-20 space-y-24">
         {efforts.map((e, i) => (
           <Reveal key={e.title} delay={i * 100}>
-            <article className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <article
+              className="grid grid-cols-1 md:grid-cols-12 gap-8"
+              data-cursor-ref={
+                i === 0 ? "§ ITINERIS · ONGOING" : undefined
+              }
+            >
               <div className="md:col-span-3">
                 <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
                   {e.kind}
