@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const PARTICLE_COUNT = 12;
+const PARTICLE_COUNT = 14;
 
 /** Deterministic 0..1 sequence from (index, salt). Keeps server and client
  *  renders in sync (no hydration mismatch) while still looking random. */
@@ -45,7 +45,11 @@ export function DustLayer() {
       const dur = 50 + drand(i, 5) * 25; // 50–75s
       // Negative delay so animations start mid-cycle and don't synchronise
       const delay = -drand(i, 6) * dur;
-      const peak = 0.07 + drand(i, 7) * 0.03; // 7–10%
+      // 16 – 24% peak. Previous 7–10% range was invisible against the
+      // warm canvas because the old warm-sepia particles shared its hue;
+      // switched to ink-toned particles which read against ivory at this
+      // range without feeling like dirt on the lens.
+      const peak = 0.16 + drand(i, 7) * 0.08;
       s.style.setProperty("--sx", `${sx}vw`);
       s.style.setProperty("--sy", `${sy}vh`);
       s.style.setProperty("--ex", `${ex}vw`);
