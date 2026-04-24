@@ -2,6 +2,7 @@ import { CaseHeader } from "@/components/case-header";
 import { StatGrid, Stat } from "@/components/stat";
 import { PullQuote } from "@/components/pull-quote";
 import { ArrowCTA } from "@/components/arrow-cta";
+import { Figure } from "@/components/figure";
 
 export const metadata = {
   title: "Bautagesbericht Pro — Codex Ahmed",
@@ -23,74 +24,81 @@ export const metadata = {
 
 <div className="max-w-4xl">
 
-## The brief
+Foremen finish their shifts covered in mud, with a dying phone battery and no appetite for opening a form. They will, however, pick up a phone and talk. That observation ran through every decision on **Bautagesbericht Pro** — the construction daily-reporting PWA I led the front-end on during my internship at Teamworks AI, for Baumann GmbH.
 
-In the German construction industry the *Bautagesbericht* is a legally-weighty daily log of site activity, weather, personnel, materials, and incidents. It is overwhelmingly still written by hand or in Excel at the end of a long shift — a workflow that is slow, error-prone, and essentially unqueryable.
+In the German construction industry the *Bautagesbericht* is a legally significant document recording daily site activity, weather, personnel, materials, and incidents. Traditionally it is filled in by hand or in Excel at the end of a long shift — a workflow that is slow, error-prone, and impossible to query analytically. The brief was to replace that workflow with something a foreman could actually use in the cold, with muddy gloves, on a marginal LTE signal.
 
-Baumann GmbH, a mid-sized construction firm, asked us to replace that workflow with something a foreman could actually use in the cold, with muddy gloves, on a dying phone battery and a marginal LTE signal.
+## Architecture
 
-## What we shipped
+A React 18 / TypeScript 5.9 single-page app, bundled by Vite with the SWC plugin for sub-second rebuilds. State is split between TanStack Query for server cache and React Hook Form with Zod for validated form state. Persistence lives in Supabase — PostgreSQL with row-level-security policies per role, Supabase Storage for photographic evidence, and Deno-based Edge Functions for operations that cannot be trusted to the client.
 
-A Progressive Web App that works offline first, speaks seven languages, and — most usefully — can be bypassed entirely in favour of a phone call.
-
-<StatGrid>
-  <Stat value="15 kLOC" label="TypeScript shipped" />
-  <Stat value="7" label="Languages (with RTL)" />
-  <Stat value="3" label="Role tiers" />
-  <Stat value="4–6 min" label="Report by phone call" />
-</StatGrid>
+<Figure
+  src="/baumann/architecture.png"
+  alt="End-to-end architecture: mobile PWA (React 18 + Vite, TanStack Query, Supabase JS client, Workbox service worker, IndexedDB, i18next, Zod + RHF, BarcodeDetector with WASM fallback) connecting over HTTPS/WSS to a Supabase back-end (PostgreSQL with RLS, Storage, Edge Functions) which fans out to Azure OpenAI, Azure Whisper, MessageBird, and SMTP."
+  caption="End-to-end architecture"
+  label="fig. i"
+  width={1400}
+  height={933}
+/>
 
 ## Offline-first, not offline-tolerant
 
-Construction sites lose connectivity often enough that "graceful offline" isn't a feature — it's the design centre. Every write is persisted to IndexedDB (via `idb`) before the UI acknowledges it, queued through a sync manager, and reconciled against Supabase when the network returns. A Workbox service worker handles asset caching and background sync. Each queue entry carries a client-generated UUID so the server can deduplicate retries safely.
+Construction sites lose connectivity often enough that *graceful offline* is not a feature — it is the design centre. Every report is written first to IndexedDB via `idb`, queued through a custom sync-manager, and reconciled against Supabase when the network returns. A Workbox service worker handles asset caching and background sync. Each queued entry carries a client-generated UUID so the server can deduplicate retries safely.
 
 A foreman can fill in a report, walk into a tunnel, have the OS kill the tab mid-save, reopen the app an hour later, and find the draft intact.
 
+<Figure
+  src="/baumann/sync-states.png"
+  alt="Report lifecycle state machine: DRAFT transitions on submit to QUEUED, which transitions on network-up to SYNCING, which either resolves to SYNCED (no conflict) or to CONFLICT → RESOLVE → SYNCING. A FAILED state retries into QUEUED."
+  caption="Report lifecycle state machine"
+  label="fig. ii"
+  width={1400}
+  height={1018}
+/>
+
 ## The Fonio voice agent
 
-The single most distinctive feature is the <span data-cursor-ref="§ FONIO · MMXXVI">*report-by-phone* flow</span>. A foreman either dials a dedicated project number or is called at an agreed time by a German conversational agent provided by [fonio.ai](https://fonio.ai). The agent conducts a structured conversation — site, weather, personnel, work performed, materials, incidents, open to-dos.
+The single most distinctive feature of the platform is a telephony-first reporting workflow, built on [fonio.ai](https://fonio.ai), a German conversational-AI telephony provider. A foreman either dials a dedicated project number or receives an outbound call from the Fonio agent at an agreed time. The agent conducts a structured German-language conversation covering site, weather, personnel, work performed, materials, incidents, and open to-dos.
 
-At end-of-call, fonio POSTs a webhook to a Supabase Edge Function, which:
+At end-of-call, Fonio POSTs a webhook payload to a Supabase Edge Function, which identifies the caller by normalised E.164 phone number, passes the transcript to OpenAI with a strict JSON schema, and writes the extracted report to the database as a draft. The foreman reviews and approves on a phone or tablet the next morning — or the office does it for them.
 
-1. Identifies the caller by normalized E.164 phone number
-2. Sends the transcript to OpenAI with a strict JSON schema
-3. Writes the extracted report to the database as a draft
-
-The foreman reviews and approves on a phone or tablet the next morning — or the office does it for them.
+<Figure
+  src="/baumann/fonio-pipeline.png"
+  alt="Report-by-call pipeline: foreman on site calls the fonio.ai voice agent, which POSTs a webhook at end-of-call to a Supabase Edge Function that normalises the E.164 number, looks the caller up in profiles, sends the transcript to OpenAI for strict JSON extraction (baustelle, datum, personal, wetter, arbeiten, material, besonderheiten, todos, startzeit, endzeit), and writes a draft row linked to the audio."
+  caption="Report-by-call pipeline"
+  label="fig. iii"
+  width={1400}
+  height={661}
+/>
 
 <PullQuote attribution="Field test, Q1 2026">
 Fifteen minutes of form-driven entry, compressed to a four- to six-minute conversation — without loss of fidelity.
 </PullQuote>
 
-## Roles & row-level security
+## Roles, RLS, and translation
 
-Three tiers, enforced both client-side and authoritatively by Postgres row-level-security policies on Supabase:
+Three roles: **laborer** submits reports through a voice-first UI, **foreman** reviews and approves, **manager** handles analytics and administration. Role separation is enforced both on the client and authoritatively by Postgres row-level-security policies. A missing RLS policy on a protected column now fails a pre-commit lint pass; it is not a code-review concern any more.
 
-- **Laborer** — submits reports, voice-first UI, minimal chrome.
-- **Foreman** — reviews, approves, edits.
-- **Manager** — analytics, administration, exports.
+Baumann's workforce speaks German as the default, with substantial numbers of workers speaking Arabic, Turkish, Polish, Romanian, and Croatian. The application is localised through `i18next` into seven languages, with right-to-left layout support for Arabic. A pre-commit script walks the source for every `t()` call, collects the keys, and fails the commit if any locale file is missing one. The class of *missing translation* bugs has effectively been extinguished.
 
-A missing RLS policy on a protected column now fails a pre-commit lint pass; it's not a code-review concern any more.
+## Auxiliary features
 
-## Seven languages, no translation drift
+Beyond the core reporting flow I implemented an address autocomplete via a geocoding service, a barcode scanner for material tracking using the browser's native `BarcodeDetector` API with a WASM fallback, PDF export with localised templates, and a Juracheck dialog that routes ambiguous legal-compliance questions to an LLM for triage.
 
-Baumann's workforce speaks German, English, Arabic, Turkish, Polish, Romanian, and Croatian — with RTL layout support for Arabic. `i18next` handles the runtime; a pre-commit script walks the source for every `t()` call, collects the keys, and fails the commit if any locale file is missing one. Hard-coded strings are disallowed by code review.
+Each of these is a thin feature. The value is that the app is now the place where the foreman already is, so adding a fifteenth thing costs one morning instead of a project.
 
-The class of "missing translation" bugs has effectively been extinguished.
+## Outcome
 
-## Auxiliary features that paid for themselves
+<StatGrid>
+  <Stat value="15 kLOC" label="TypeScript shipped" />
+  <Stat value="7" label="Languages, with RTL" />
+  <Stat value="3" label="Role tiers" />
+  <Stat value="4–6 min" label="Report by phone call" />
+</StatGrid>
 
-- **Address autocomplete** via a geocoding service.
-- **Barcode scanner** using the native `BarcodeDetector` API with a WASM fallback.
-- **PDF export** with localized templates.
-- **Juracheck** — ambiguous legal-compliance questions get routed to an LLM for triage.
-- **MessageBird / SMTP** notification dispatch.
+The application is in staged rollout at the time of writing, with a complete Vitest suite and a CI pipeline running lint, type-checking, and unit tests on each pull request. The codebase is approximately fifteen thousand lines of TypeScript, plus SQL migrations and Deno edge functions.
 
-Each of these is a thin feature; the value is that the app is now the place where the foreman already is, so adding a fifteenth thing costs one morning instead of a project.
-
-## What this project taught me
-
-That *integration is the unit of value*, not invention. The interesting parts of this codebase are not the models or the shaders — they are the pre-commit hooks, the idempotent queues, the role-aware RLS, the webhook deduplication, the localized PDF footer. Nothing glamorous. Everything durable.
+The interesting parts of this project were not the models or the shaders. They were the pre-commit hooks, the idempotent queues, the role-aware RLS, the webhook deduplication, the localised PDF footer. Nothing glamorous. Everything durable.
 
 <div className="mt-16 flex gap-4">
   <ArrowCTA href="/praxis">Back to Praxis</ArrowCTA>
