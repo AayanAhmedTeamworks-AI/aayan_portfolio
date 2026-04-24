@@ -7,6 +7,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { MeanderLoader } from "@/components/meander-loader";
 import { LenisRoot } from "@/components/lenis-root";
+import { Cursor } from "@/components/cursor";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-canvas text-ink font-sans antialiased grain-overlay">
         <LenisRoot>
+          <Cursor />
           <MeanderLoader />
           <Nav />
           {children}

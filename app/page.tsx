@@ -43,7 +43,10 @@ export default function Home() {
   return (
     <>
       {/* Frontispiece */}
-      <section className="relative min-h-[100dvh] flex flex-col overflow-hidden">
+      <section
+        className="relative min-h-[100dvh] flex flex-col overflow-hidden"
+        data-cursor="Look"
+      >
         {/* Bust relief + dust — one R3F canvas, full-bleed, absolute */}
         <FrontispieceBust />
 
