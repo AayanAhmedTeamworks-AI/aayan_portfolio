@@ -2,8 +2,16 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Center, Environment, useGLTF } from "@react-three/drei";
+import {
+  Bloom,
+  EffectComposer,
+  N8AO,
+  Noise,
+  Vignette,
+} from "@react-three/postprocessing";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { scrollProgressRef } from "@/lib/scroll-progress";
 
 useGLTF.preload("/bust.glb");
 
@@ -20,6 +28,9 @@ function Bust() {
   const { size } = useThree();
   const isMobile = size.width < 768;
   const rot = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  // Damped scroll-driven deltas layered on top of cursor & idle sway.
+  const scrollRotX = useRef(0);
+  const scrollPosZ = useRef(0);
 
   useEffect(() => {
     const marble = new THREE.MeshPhysicalMaterial({
@@ -48,17 +59,24 @@ function Bust() {
     const t = state.clock.elapsedTime;
     const { pointer } = state;
 
-    // Tighter rotation bounds because the double-bust is wider — keeps both
-    // historians in frame at the extremes.
+    // Cursor-driven rotation — tighter bounds because the double-bust is wider.
     rot.current.tx = pointer.x * 0.35;
     rot.current.ty = -pointer.y * 0.15;
-
     rot.current.x += (rot.current.ty - rot.current.x) * 0.055;
     rot.current.y += (rot.current.tx - rot.current.y) * 0.055;
 
+    // Scroll choreography — lerp toward targets so motion is silky on both
+    // fast scrolls and reverse scrolls. 0.08 per frame ≈ ~1/8 remaining per
+    // 16 ms frame → settles in ~15 frames (250 ms) for each step change.
+    const p = scrollProgressRef.current;
+    scrollRotX.current = THREE.MathUtils.lerp(scrollRotX.current, -0.14 * p, 0.08);
+    scrollPosZ.current = THREE.MathUtils.lerp(scrollPosZ.current, -0.6 * p, 0.08);
+
     group.current.rotation.y = rot.current.y + Math.sin(t * 0.2) * 0.04;
-    group.current.rotation.x = rot.current.x + Math.cos(t * 0.13) * 0.02;
+    group.current.rotation.x =
+      rot.current.x + Math.cos(t * 0.13) * 0.02 + scrollRotX.current;
     group.current.position.y = Math.sin(t * 0.25) * 0.04;
+    group.current.position.z = scrollPosZ.current;
   });
 
   return (
@@ -142,10 +160,11 @@ export function FrontispieceBust() {
           alpha: true,
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.0,
+          outputColorSpace: THREE.SRGBColorSpace,
         }}
         style={{ position: "absolute", inset: 0 }}
       >
-        {/* Museum lighting */}
+        {/* Museum lighting — HDRI provides IBL, directionals carry the drama */}
         <ambientLight intensity={0.4} color="#f5efe3" />
         <directionalLight
           position={[4, 5, 4]}
@@ -159,13 +178,29 @@ export function FrontispieceBust() {
         />
         <pointLight position={[0, -3, 3]} intensity={0.5} color="#8b6b3f" />
 
-        {/* Studio HDRI for subtle reflections on the marble */}
-        <Environment preset="studio" background={false} />
+        {/* Museum HDRI — Adams Place Bridge (Poly Haven, CC0) — IBL only, no skybox */}
+        <Environment
+          files="/hdri/adams_place_bridge_1k.hdr"
+          background={false}
+        />
 
         <Suspense fallback={null}>
           <Bust />
           <Dust />
         </Suspense>
+
+        {/* Post pipeline — N8AO settles the bust into space, Bloom kisses
+            highlights, Vignette frames, Noise kills banding on the gradient. */}
+        <EffectComposer multisampling={0} enableNormalPass>
+          <N8AO aoRadius={0.5} intensity={2} />
+          <Bloom
+            intensity={0.18}
+            luminanceThreshold={0.82}
+            mipmapBlur
+          />
+          <Vignette offset={0.35} darkness={0.6} eskil={false} />
+          <Noise opacity={0.025} premultiply={false} />
+        </EffectComposer>
       </Canvas>
     </div>
   );
