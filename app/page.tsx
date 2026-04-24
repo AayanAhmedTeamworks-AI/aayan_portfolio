@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { FrontispieceBust } from "@/components/frontispiece-bust";
 import { Reveal } from "@/components/reveal";
 import { Meander } from "@/components/meander";
+import { VTLink } from "@/components/vt-link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 
 const chapters = [
@@ -12,6 +12,7 @@ const chapters = [
     blurb:
       "Production systems shipped at Teamworks AI — an offline-first construction PWA with a German voice-agent, n8n orchestrations integrating Microsoft Graph / CAPMO / Groq, and on-prem deployments for data-sovereign clients.",
     meta: "Six works",
+    ref: "CAT. I — SIX WORKS",
   },
   {
     numeral: "II",
@@ -20,6 +21,7 @@ const chapters = [
     blurb:
       "Research and academic pieces. Generative-Engine Optimization, explainable AI with LIME and saliency maps, notes from THI Ingolstadt.",
     meta: "Three pieces",
+    ref: "CAT. II — THREE PIECES",
   },
   {
     numeral: "III",
@@ -28,6 +30,7 @@ const chapters = [
     blurb:
       "Public and social-impact work. A service-design project for underserved drivers, and past fundraising with Amnesty International.",
     meta: "Two efforts",
+    ref: "CAT. III — TWO EFFORTS",
   },
   {
     numeral: "IV",
@@ -36,6 +39,7 @@ const chapters = [
     blurb:
       "Get in touch. Open to thesis collaboration, DACH-SME automation engagements, and thoughtful internship continuations.",
     meta: "Get in touch",
+    ref: "CAT. IV — LETTER",
   },
 ];
 
@@ -46,6 +50,7 @@ export default function Home() {
       <section
         className="relative min-h-[100dvh] flex flex-col overflow-hidden"
         data-cursor="Look"
+        data-cursor-ref="CODEX AHMED · FOL. I"
       >
         {/* Bust relief + dust — one R3F canvas, full-bleed, absolute */}
         <FrontispieceBust />
@@ -117,9 +122,15 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-20">
           {chapters.map((c, i) => (
             <Reveal key={c.numeral} delay={i * 100}>
-              <Link href={c.slug} className="group block">
+              <VTLink
+                href={c.slug}
+                className="group block"
+                data-cursor-ref={c.ref}
+              >
                 <div className="flex items-baseline gap-6">
-                  <span className="font-serif italic text-sepia/70 text-3xl md:text-4xl tracking-tight">
+                  <span
+                    className={`font-serif italic text-sepia/70 text-3xl md:text-4xl tracking-tight chapter-numeral-${c.numeral.toLowerCase()}`}
+                  >
                     {c.numeral}
                   </span>
                   <h3 className="font-serif text-5xl md:text-[4.5rem] tracking-[-0.03em] leading-none text-ink group-hover:text-sepia transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]">
@@ -136,7 +147,7 @@ export default function Home() {
                   <span className="h-px bg-hairline flex-1 group-hover:bg-sepia/45 transition-colors duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" />
                   <ArrowRightIcon size={13} weight="light" />
                 </div>
-              </Link>
+              </VTLink>
             </Reveal>
           ))}
         </div>

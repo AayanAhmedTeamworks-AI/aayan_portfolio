@@ -29,7 +29,8 @@ export default function Studia() {
   return (
     <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
       <ChapterHeading
-        numeral="II · Studia"
+        numeral="II"
+        chapter="Studia"
         label="Research & study"
         tagline="Questions pulled at, sometimes answered. Some self-initiated, some coursework at THI Ingolstadt."
       />

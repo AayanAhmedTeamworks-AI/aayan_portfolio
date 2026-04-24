@@ -1,37 +1,45 @@
-import Image from "next/image";
 import { ChapterHeading } from "@/components/chapter-heading";
 import { Reveal } from "@/components/reveal";
 import { ArrowCTA } from "@/components/arrow-cta";
+import { PortraitNiche } from "@/components/portrait-niche";
 
 export default function Contactus() {
   return (
     <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
       <ChapterHeading
-        numeral="IV · Contactus"
+        numeral="IV"
+        chapter="Contactus"
         label="Get in touch"
         tagline="Best reached by email. I reply in English or German. Occasionally slow, always honest."
       />
 
       <div className="mt-24 grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20 items-start">
-        {/* Portrait */}
-        <Reveal className="md:col-span-5">
-          <figure className="relative">
-            <div className="relative overflow-hidden rounded-lg ring-1 ring-hairline bg-marble/40">
-              <Image
-                src="/portrait-valencia.jpg"
-                alt="Portrait of Syed Aayan Ahmed, Valencia"
-                width={900}
-                height={1200}
-                className="w-full h-auto grayscale-[8%] contrast-[1.02] brightness-[0.98]"
-                priority
-              />
-            </div>
-            <figcaption className="mt-4 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
-              <span>València, MMXXV</span>
-              <span className="text-sepia/80">fig. i</span>
-            </figcaption>
-          </figure>
-        </Reveal>
+        {/* Portraits — fig. i photograph paired with fig. ii sculpted bust */}
+        <div className="md:col-span-5 space-y-14">
+          <Reveal delay={0}>
+            <PortraitNiche
+              src="/portrait-valencia.jpg"
+              alt="Portrait of Syed Aayan Ahmed, València"
+              width={900}
+              height={1200}
+              caption="València, MMXXV"
+              figureLabel="fig. i"
+              variant="plate"
+              priority
+            />
+          </Reveal>
+          <Reveal delay={150}>
+            <PortraitNiche
+              src="/bust.png"
+              alt="Sculpted marble portrait of Syed Aayan Ahmed"
+              width={1032}
+              height={1328}
+              caption="—"
+              figureLabel="fig. ii"
+              variant="niche"
+            />
+          </Reveal>
+        </div>
 
         {/* Bio + links */}
         <div className="md:col-span-7">
