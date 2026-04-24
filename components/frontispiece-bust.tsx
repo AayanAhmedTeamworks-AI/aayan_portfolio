@@ -11,6 +11,7 @@ import {
 } from "@react-three/postprocessing";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { scrollProgressRef } from "@/lib/scroll-progress";
 
 useGLTF.preload("/bust.glb");
 
@@ -27,6 +28,9 @@ function Bust() {
   const { size } = useThree();
   const isMobile = size.width < 768;
   const rot = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  // Damped scroll-driven deltas layered on top of cursor & idle sway.
+  const scrollRotX = useRef(0);
+  const scrollPosZ = useRef(0);
 
   useEffect(() => {
     const marble = new THREE.MeshPhysicalMaterial({
@@ -55,17 +59,24 @@ function Bust() {
     const t = state.clock.elapsedTime;
     const { pointer } = state;
 
-    // Tighter rotation bounds because the double-bust is wider — keeps both
-    // historians in frame at the extremes.
+    // Cursor-driven rotation — tighter bounds because the double-bust is wider.
     rot.current.tx = pointer.x * 0.35;
     rot.current.ty = -pointer.y * 0.15;
-
     rot.current.x += (rot.current.ty - rot.current.x) * 0.055;
     rot.current.y += (rot.current.tx - rot.current.y) * 0.055;
 
+    // Scroll choreography — lerp toward targets so motion is silky on both
+    // fast scrolls and reverse scrolls. 0.08 per frame ≈ ~1/8 remaining per
+    // 16 ms frame → settles in ~15 frames (250 ms) for each step change.
+    const p = scrollProgressRef.current;
+    scrollRotX.current = THREE.MathUtils.lerp(scrollRotX.current, -0.14 * p, 0.08);
+    scrollPosZ.current = THREE.MathUtils.lerp(scrollPosZ.current, -0.6 * p, 0.08);
+
     group.current.rotation.y = rot.current.y + Math.sin(t * 0.2) * 0.04;
-    group.current.rotation.x = rot.current.x + Math.cos(t * 0.13) * 0.02;
+    group.current.rotation.x =
+      rot.current.x + Math.cos(t * 0.13) * 0.02 + scrollRotX.current;
     group.current.position.y = Math.sin(t * 0.25) * 0.04;
+    group.current.position.z = scrollPosZ.current;
   });
 
   return (
