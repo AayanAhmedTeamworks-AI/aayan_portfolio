@@ -1,5 +1,5 @@
 import { ChapterProgress } from "@/components/chapter-progress";
-import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import { ChapterCover } from "@/components/chapter-cover";
 import Colophon from "@/components/colophon";
 import { PageTurn } from "@/components/page-turn";
 import { ReadingFocus } from "@/components/reading-focus";
@@ -35,7 +35,7 @@ export default function Studia() {
       <ChapterProgress />
       <ReadingFocus selector="[data-reading-focus] p" />
       <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-        <ChapterTitleSticky
+        <ChapterCover
           numeral="II"
           chapter="Studia"
           label="Research & study"

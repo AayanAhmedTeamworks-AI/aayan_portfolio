@@ -1,9 +1,10 @@
 import { ChapterProgress } from "@/components/chapter-progress";
-import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import { ChapterCover } from "@/components/chapter-cover";
 import Colophon from "@/components/colophon";
 import { PageTurn } from "@/components/page-turn";
 import { ReadingFocus } from "@/components/reading-focus";
 import { Reveal } from "@/components/reveal";
+import { TiltCard } from "@/components/tilt-card";
 import { ProjectCard, type Project } from "@/components/project-card";
 
 const projects: Project[] = [
@@ -56,7 +57,7 @@ export default function Praxis() {
       <ChapterProgress />
       <ReadingFocus selector="[data-reading-focus] p" />
       <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-        <ChapterTitleSticky
+        <ChapterCover
           numeral="I"
           chapter="Praxis"
           label="Production work"
@@ -69,7 +70,9 @@ export default function Praxis() {
         >
           {projects.map((p, i) => (
             <Reveal key={p.title} delay={i * 100} className={sizeClass(p.size)}>
-              <ProjectCard p={p} />
+              <TiltCard className="h-full">
+                <ProjectCard p={p} />
+              </TiltCard>
             </Reveal>
           ))}
         </div>

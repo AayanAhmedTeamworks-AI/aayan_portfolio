@@ -1,5 +1,5 @@
 import { ChapterProgress } from "@/components/chapter-progress";
-import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import { ChapterCover } from "@/components/chapter-cover";
 import Colophon from "@/components/colophon";
 import { ReadingFocus } from "@/components/reading-focus";
 import { Reveal } from "@/components/reveal";
@@ -12,7 +12,7 @@ export default function Contactus() {
       <ChapterProgress />
       <ReadingFocus selector="[data-reading-focus] p" />
       <div data-reading-focus className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-        <ChapterTitleSticky
+        <ChapterCover
           numeral="IV"
           chapter="Contactus"
           label="Get in touch"
