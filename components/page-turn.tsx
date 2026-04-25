@@ -38,15 +38,20 @@ export function PageTurn({
 
     let rafId = 0;
     const tick = () => {
-      // Guard against the unmount race: cleanup cancels rAF, but a tick
-      // already in flight when navigation fires can still run after the
-      // ref has been nulled by React.
       const node = curlRef.current;
       if (!node) return;
-      const sp = scrollProgressRef.current;
-      const t = Math.max(0, Math.min(1, (sp - 0.85) / 0.15));
-      node.style.transform = "rotateX(" + (-25 * t).toFixed(2) + "deg)";
-      node.style.opacity = String(0.6 + 0.4 * t);
+      // Element-local progress instead of whole-page scroll progress.
+      // This lets the curl animate across the endplate's own travel into
+      // view, regardless of total page length. Previous version used
+      // scrollProgressRef[0.85, 1.0] which on long pages resolved in a
+      // tiny window the eye missed entirely.
+      const rect = node.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when element top is at viewport bottom (just appearing)
+      // 1 when element top has scrolled to viewport top (fully arrived)
+      const t = Math.max(0, Math.min(1, (vh - rect.top) / vh));
+      node.style.transform = "rotateX(" + (-40 * t).toFixed(2) + "deg)";
+      node.style.opacity = String(0.35 + 0.65 * t);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
@@ -68,7 +73,7 @@ export function PageTurn({
           transformStyle: "preserve-3d",
           transformOrigin: "bottom center",
           transform: "rotateX(0deg)",
-          opacity: 0.6,
+          opacity: 0.35,
         }}
       >
         <div className="font-serif italic text-sepia text-2xl">❦</div>
