@@ -34,6 +34,7 @@ export function Footer() {
                 <li key={c.h}>
                   <VTLink
                     href={c.h}
+                    data-cursor-destination={c.n}
                     className="font-serif text-lg text-ink/85 hover:text-sepia transition-colors duration-300"
                   >
                     <span className="text-sepia/65 italic mr-2 text-base">

@@ -1,17 +1,23 @@
-import { ChapterHeading } from "@/components/chapter-heading";
+import { ChapterProgress } from "@/components/chapter-progress";
+import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import Colophon from "@/components/colophon";
+import { ReadingFocus } from "@/components/reading-focus";
 import { Reveal } from "@/components/reveal";
 import { ArrowCTA } from "@/components/arrow-cta";
 import { PortraitNiche } from "@/components/portrait-niche";
 
 export default function Contactus() {
   return (
-    <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-      <ChapterHeading
-        numeral="IV"
-        chapter="Contactus"
-        label="Get in touch"
-        tagline="Best reached by email. I reply in English or German. Occasionally slow, always honest."
-      />
+    <>
+      <ChapterProgress />
+      <ReadingFocus selector="[data-reading-focus] p" />
+      <div data-reading-focus className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
+        <ChapterTitleSticky
+          numeral="IV"
+          chapter="Contactus"
+          label="Get in touch"
+          tagline="Best reached by email. I reply in English or German. Occasionally slow, always honest."
+        />
 
       <div className="mt-24 grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20 items-start">
         {/* Portraits — fig. i photograph paired with fig. ii sculpted bust */}
@@ -102,6 +108,9 @@ export default function Contactus() {
           </Reveal>
         </div>
       </div>
-    </div>
+
+        <Colophon numeral="IV" />
+      </div>
+    </>
   );
 }

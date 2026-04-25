@@ -23,6 +23,7 @@ export function Nav() {
             <li key={it.href}>
               <VTLink
                 href={it.href}
+                data-cursor-destination={it.numeral}
                 className="group flex items-baseline gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-mute hover:text-ink transition-colors duration-300"
               >
                 <span className="font-serif italic text-sepia/75 text-sm">

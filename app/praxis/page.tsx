@@ -1,4 +1,8 @@
-import { ChapterHeading } from "@/components/chapter-heading";
+import { ChapterProgress } from "@/components/chapter-progress";
+import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import Colophon from "@/components/colophon";
+import { PageTurn } from "@/components/page-turn";
+import { ReadingFocus } from "@/components/reading-focus";
 import { Reveal } from "@/components/reveal";
 import { ProjectCard, type Project } from "@/components/project-card";
 
@@ -48,25 +52,37 @@ function sizeClass(s: Project["size"]) {
 
 export default function Praxis() {
   return (
-    <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-      <ChapterHeading
+    <>
+      <ChapterProgress />
+      <ReadingFocus selector="[data-reading-focus] p" />
+      <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
+        <ChapterTitleSticky
+          numeral="I"
+          chapter="Praxis"
+          label="Production work"
+          tagline="Shipped systems for firms in the DACH region. Restraint as discipline; integration as the unit of value."
+        />
+
+        <div
+          data-reading-focus
+          className="mt-20 grid grid-cols-1 md:grid-cols-6 gap-8 auto-rows-min"
+        >
+          {projects.map((p, i) => (
+            <Reveal key={p.title} delay={i * 100} className={sizeClass(p.size)}>
+              <ProjectCard p={p} />
+            </Reveal>
+          ))}
+        </div>
+
+        <Colophon numeral="I" />
+      </div>
+      <PageTurn
         numeral="I"
         chapter="Praxis"
-        label="Production work"
-        tagline="Shipped systems for firms in the DACH region. Restraint as discipline; integration as the unit of value."
+        nextNumeral="II"
+        nextChapter="Studia"
+        nextHref="/studia"
       />
-
-      <div className="mt-20 grid grid-cols-1 md:grid-cols-6 gap-8 auto-rows-min">
-        {projects.map((p, i) => (
-          <Reveal
-            key={p.title}
-            delay={i * 100}
-            className={sizeClass(p.size)}
-          >
-            <ProjectCard p={p} />
-          </Reveal>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
