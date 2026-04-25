@@ -53,10 +53,12 @@ export function ChapterProgress() {
 
     let raf = 0;
     const tick = () => {
+      // Guard against the unmount race during client navigation.
+      const node = pathRef.current;
+      if (!node) return;
       const p = scrollProgressRef.current;
-      // Clamp defensively so any rogue value still produces a valid offset.
       const clamped = p < 0 ? 0 : p > 1 ? 1 : p;
-      path.style.strokeDashoffset = String(length * (1 - clamped));
+      node.style.strokeDashoffset = String(length * (1 - clamped));
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

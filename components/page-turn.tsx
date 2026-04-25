@@ -38,11 +38,15 @@ export function PageTurn({
 
     let rafId = 0;
     const tick = () => {
+      // Guard against the unmount race: cleanup cancels rAF, but a tick
+      // already in flight when navigation fires can still run after the
+      // ref has been nulled by React.
+      const node = curlRef.current;
+      if (!node) return;
       const sp = scrollProgressRef.current;
       const t = Math.max(0, Math.min(1, (sp - 0.85) / 0.15));
-      curlRef.current!.style.transform =
-        "rotateX(" + (-25 * t).toFixed(2) + "deg)";
-      curlRef.current!.style.opacity = String(0.6 + 0.4 * t);
+      node.style.transform = "rotateX(" + (-25 * t).toFixed(2) + "deg)";
+      node.style.opacity = String(0.6 + 0.4 * t);
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
