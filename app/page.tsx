@@ -130,6 +130,7 @@ export default function Home() {
                 href={c.slug}
                 className="group block"
                 data-cursor-ref={c.ref}
+                data-cursor-destination={c.numeral}
               >
                 <div className="flex items-baseline gap-6">
                   <span
