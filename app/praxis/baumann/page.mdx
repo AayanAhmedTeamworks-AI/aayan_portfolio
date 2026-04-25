@@ -5,6 +5,7 @@ import { ArrowCTA } from "@/components/arrow-cta";
 import { Figure } from "@/components/figure";
 import { ChapterProgress } from "@/components/chapter-progress";
 import { ReadingFocus } from "@/components/reading-focus";
+import { ContainerScroll } from "@/components/container-scroll";
 import DropCap from "@/components/drop-cap";
 import Colophon from "@/components/colophon";
 
@@ -41,14 +42,16 @@ In the German construction industry the *Bautagesbericht* is a legally significa
 
 A React 18 / TypeScript 5.9 single-page app, bundled by Vite with the SWC plugin for sub-second rebuilds. State is split between TanStack Query for server cache and React Hook Form with Zod for validated form state. Persistence lives in Supabase — PostgreSQL with row-level-security policies per role, Supabase Storage for photographic evidence, and Deno-based Edge Functions for operations that cannot be trusted to the client.
 
-<Figure
-  src="/baumann/architecture.png"
-  alt="End-to-end architecture: mobile PWA (React 18 + Vite, TanStack Query, Supabase JS client, Workbox service worker, IndexedDB, i18next, Zod + RHF, BarcodeDetector with WASM fallback) connecting over HTTPS/WSS to a Supabase back-end (PostgreSQL with RLS, Storage, Edge Functions) which fans out to Azure OpenAI, Azure Whisper, MessageBird, and SMTP."
-  caption="End-to-end architecture"
-  label="fig. i"
-  width={1400}
-  height={933}
-/>
+<ContainerScroll>
+  <Figure
+    src="/baumann/architecture.png"
+    alt="End-to-end architecture: mobile PWA (React 18 + Vite, TanStack Query, Supabase JS client, Workbox service worker, IndexedDB, i18next, Zod + RHF, BarcodeDetector with WASM fallback) connecting over HTTPS/WSS to a Supabase back-end (PostgreSQL with RLS, Storage, Edge Functions) which fans out to Azure OpenAI, Azure Whisper, MessageBird, and SMTP."
+    caption="End-to-end architecture"
+    label="fig. i"
+    width={1400}
+    height={933}
+  />
+</ContainerScroll>
 
 ## Offline-first, not offline-tolerant
 
@@ -56,14 +59,16 @@ Construction sites lose connectivity often enough that *graceful offline* is not
 
 A foreman can fill in a report, walk into a tunnel, have the OS kill the tab mid-save, reopen the app an hour later, and find the draft intact.
 
-<Figure
-  src="/baumann/sync-states.png"
-  alt="Report lifecycle state machine: DRAFT transitions on submit to QUEUED, which transitions on network-up to SYNCING, which either resolves to SYNCED (no conflict) or to CONFLICT → RESOLVE → SYNCING. A FAILED state retries into QUEUED."
-  caption="Report lifecycle state machine"
-  label="fig. ii"
-  width={1400}
-  height={1018}
-/>
+<ContainerScroll>
+  <Figure
+    src="/baumann/sync-states.png"
+    alt="Report lifecycle state machine: DRAFT transitions on submit to QUEUED, which transitions on network-up to SYNCING, which either resolves to SYNCED (no conflict) or to CONFLICT → RESOLVE → SYNCING. A FAILED state retries into QUEUED."
+    caption="Report lifecycle state machine"
+    label="fig. ii"
+    width={1400}
+    height={1018}
+  />
+</ContainerScroll>
 
 ## The Fonio voice agent
 
@@ -71,14 +76,16 @@ The single most distinctive feature of the platform is a telephony-first reporti
 
 At end-of-call, Fonio POSTs a webhook payload to a Supabase Edge Function, which identifies the caller by normalised E.164 phone number, passes the transcript to OpenAI with a strict JSON schema, and writes the extracted report to the database as a draft. The foreman reviews and approves on a phone or tablet the next morning — or the office does it for them.
 
-<Figure
-  src="/baumann/fonio-pipeline.png"
-  alt="Report-by-call pipeline: foreman on site calls the fonio.ai voice agent, which POSTs a webhook at end-of-call to a Supabase Edge Function that normalises the E.164 number, looks the caller up in profiles, sends the transcript to OpenAI for strict JSON extraction (baustelle, datum, personal, wetter, arbeiten, material, besonderheiten, todos, startzeit, endzeit), and writes a draft row linked to the audio."
-  caption="Report-by-call pipeline"
-  label="fig. iii"
-  width={1400}
-  height={661}
-/>
+<ContainerScroll>
+  <Figure
+    src="/baumann/fonio-pipeline.png"
+    alt="Report-by-call pipeline: foreman on site calls the fonio.ai voice agent, which POSTs a webhook at end-of-call to a Supabase Edge Function that normalises the E.164 number, looks the caller up in profiles, sends the transcript to OpenAI for strict JSON extraction (baustelle, datum, personal, wetter, arbeiten, material, besonderheiten, todos, startzeit, endzeit), and writes a draft row linked to the audio."
+    caption="Report-by-call pipeline"
+    label="fig. iii"
+    width={1400}
+    height={661}
+  />
+</ContainerScroll>
 
 <PullQuote attribution="Field test, Q1 2026">
 Fifteen minutes of form-driven entry, compressed to a four- to six-minute conversation — without loss of fidelity.
