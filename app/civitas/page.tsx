@@ -1,4 +1,8 @@
-import { ChapterHeading } from "@/components/chapter-heading";
+import { ChapterProgress } from "@/components/chapter-progress";
+import { ChapterTitleSticky } from "@/components/chapter-title-sticky";
+import Colophon from "@/components/colophon";
+import { PageTurn } from "@/components/page-turn";
+import { ReadingFocus } from "@/components/reading-focus";
 import { Reveal } from "@/components/reveal";
 
 const efforts = [
@@ -23,48 +27,61 @@ const efforts = [
 
 export default function Civitas() {
   return (
-    <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
-      <ChapterHeading
+    <>
+      <ChapterProgress />
+      <ReadingFocus selector="[data-reading-focus] p" />
+      <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
+        <ChapterTitleSticky
+          numeral="III"
+          chapter="Civitas"
+          label="Public & social"
+          tagline="Work that is not invoiced. The part of a résumé that usually goes in a footnote, here given its own page."
+        />
+
+        <div data-reading-focus className="mt-20 space-y-24">
+          {efforts.map((e, i) => (
+            <Reveal key={e.title} delay={i * 100}>
+              <article
+                className="grid grid-cols-1 md:grid-cols-12 gap-8"
+                data-cursor-ref={
+                  i === 0 ? "§ ITINERIS · ONGOING" : undefined
+                }
+              >
+                <div className="md:col-span-3">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
+                    {e.kind}
+                  </p>
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-sepia/85">
+                    {e.year}
+                  </p>
+                </div>
+                <div className="md:col-span-9">
+                  <h2 className="font-serif text-5xl md:text-6xl tracking-[-0.03em] leading-[0.98] text-ink">
+                    {e.title}
+                  </h2>
+                  <p className="mt-7 text-[15px] leading-[1.75] text-ink/80 max-w-[62ch]">
+                    {e.blurb}
+                  </p>
+                  {e.note ? (
+                    <p className="mt-6 border-l-2 border-sepia/60 pl-6 font-serif italic text-xl text-ink/75 max-w-[52ch] leading-[1.4]">
+                      {e.note}
+                    </p>
+                  ) : null}
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+
+        <Colophon numeral="III" />
+      </div>
+      <PageTurn
         numeral="III"
         chapter="Civitas"
-        label="Public & social"
-        tagline="Work that is not invoiced. The part of a résumé that usually goes in a footnote, here given its own page."
+        nextNumeral="IV"
+        nextChapter="Contactus"
+        nextHref="/contactus"
       />
-
-      <div className="mt-20 space-y-24">
-        {efforts.map((e, i) => (
-          <Reveal key={e.title} delay={i * 100}>
-            <article
-              className="grid grid-cols-1 md:grid-cols-12 gap-8"
-              data-cursor-ref={
-                i === 0 ? "§ ITINERIS · ONGOING" : undefined
-              }
-            >
-              <div className="md:col-span-3">
-                <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
-                  {e.kind}
-                </p>
-                <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-sepia/85">
-                  {e.year}
-                </p>
-              </div>
-              <div className="md:col-span-9">
-                <h2 className="font-serif text-5xl md:text-6xl tracking-[-0.03em] leading-[0.98] text-ink">
-                  {e.title}
-                </h2>
-                <p className="mt-7 text-[15px] leading-[1.75] text-ink/80 max-w-[62ch]">
-                  {e.blurb}
-                </p>
-                {e.note ? (
-                  <p className="mt-6 border-l-2 border-sepia/60 pl-6 font-serif italic text-xl text-ink/75 max-w-[52ch] leading-[1.4]">
-                    {e.note}
-                  </p>
-                ) : null}
-              </div>
-            </article>
-          </Reveal>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }

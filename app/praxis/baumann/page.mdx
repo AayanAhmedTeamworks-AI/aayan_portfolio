@@ -3,6 +3,10 @@ import { StatGrid, Stat } from "@/components/stat";
 import { PullQuote } from "@/components/pull-quote";
 import { ArrowCTA } from "@/components/arrow-cta";
 import { Figure } from "@/components/figure";
+import { ChapterProgress } from "@/components/chapter-progress";
+import { ReadingFocus } from "@/components/reading-focus";
+import DropCap from "@/components/drop-cap";
+import Colophon from "@/components/colophon";
 
 export const metadata = {
   title: "Bautagesbericht Pro — Codex Ahmed",
@@ -10,7 +14,10 @@ export const metadata = {
     "An offline-first construction daily-reporting PWA with a German voice-agent. Seven languages, three roles, 15 kLOC. Teamworks AI × Baumann GmbH.",
 };
 
-<div className="max-w-[90rem] mx-auto px-8 md:px-16">
+<ChapterProgress />
+<ReadingFocus selector="[data-reading-focus] p" />
+
+<div className="max-w-[90rem] mx-auto px-8 md:px-16" data-reading-focus>
 
 <CaseHeader
   chapter="I · Praxis · i"
@@ -24,7 +31,9 @@ export const metadata = {
 
 <div className="max-w-4xl">
 
+<DropCap className="text-[15px] leading-[1.75] text-ink/85 mb-5 max-w-[62ch]">
 Foremen finish their shifts covered in mud, with a dying phone battery and no appetite for opening a form. They will, however, pick up a phone and talk. That observation ran through every decision on **Bautagesbericht Pro** — the construction daily-reporting PWA I led the front-end on during my internship at Teamworks AI, for Baumann GmbH.
+</DropCap>
 
 In the German construction industry the *Bautagesbericht* is a legally significant document recording daily site activity, weather, personnel, materials, and incidents. Traditionally it is filled in by hand or in Excel at the end of a long shift — a workflow that is slow, error-prone, and impossible to query analytically. The brief was to replace that workflow with something a foreman could actually use in the cold, with muddy gloves, on a marginal LTE signal.
 
@@ -104,6 +113,8 @@ The interesting parts of this project were not the models or the shaders. They w
   <ArrowCTA href="/praxis">Back to Praxis</ArrowCTA>
   <ArrowCTA href="/contactus">Get in touch</ArrowCTA>
 </div>
+
+<Colophon numeral="I · i" />
 
 </div>
 </div>
