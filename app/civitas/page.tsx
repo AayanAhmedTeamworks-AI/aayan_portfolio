@@ -79,8 +79,8 @@ export default function Civitas() {
         numeral="III"
         chapter="Civitas"
         nextNumeral="IV"
-        nextChapter="Contactus"
-        nextHref="/contactus"
+        nextChapter="Vita"
+        nextHref="/vita"
       />
     </>
   );

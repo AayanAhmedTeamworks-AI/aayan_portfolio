@@ -6,7 +6,9 @@ const chapters = [
   { n: "I", l: "Praxis", h: "/praxis" },
   { n: "II", l: "Studia", h: "/studia" },
   { n: "III", l: "Civitas", h: "/civitas" },
-  { n: "IV", l: "Contactus", h: "/contactus" },
+  { n: "IV", l: "Vita", h: "/vita" },
+  { n: "V", l: "Contactus", h: "/contactus" },
+  { n: "VI", l: "Experimenta", h: "/experimenta" },
 ];
 
 export function Footer() {

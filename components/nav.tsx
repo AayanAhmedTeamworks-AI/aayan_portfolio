@@ -5,7 +5,9 @@ const items = [
   { label: "Praxis", numeral: "I", href: "/praxis" },
   { label: "Studia", numeral: "II", href: "/studia" },
   { label: "Civitas", numeral: "III", href: "/civitas" },
-  { label: "Contactus", numeral: "IV", href: "/contactus" },
+  { label: "Vita", numeral: "IV", href: "/vita" },
+  { label: "Contactus", numeral: "V", href: "/contactus" },
+  { label: "Experimenta", numeral: "VI", href: "/experimenta" },
 ];
 
 export function Nav() {
@@ -18,13 +20,13 @@ export function Nav() {
         >
           <span className="italic">Codex</span> Ahmed
         </Link>
-        <ul className="hidden md:flex items-center gap-8 lg:gap-10">
+        <ul className="hidden md:flex items-center gap-5 lg:gap-7">
           {items.map((it) => (
             <li key={it.href}>
               <VTLink
                 href={it.href}
                 data-cursor-destination={it.numeral}
-                className="group flex items-baseline gap-2 font-mono text-[11px] uppercase tracking-[0.22em] text-mute hover:text-ink transition-colors duration-300"
+                className="group flex items-baseline gap-2 font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute hover:text-ink transition-colors duration-300"
               >
                 <span className="font-serif italic text-sepia/75 text-sm">
                   {it.numeral}
