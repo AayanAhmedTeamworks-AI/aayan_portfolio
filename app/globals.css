@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Tier B palette shift — deeper parchment.
-     Tokens dropped ~8–10% lightness, same relative steps preserved,
-     chosen to close the brightness seam between the HDRI/vignette hero
-     and the flat chapter surfaces. Iterate to #ddcfb4 if seam persists. */
-  --color-canvas: #e5d9c2;
-  --color-ink: #1a1613;
-  --color-sepia: #8b6b3f;
-  --color-marble: #d9cdb4;
-  --color-mute: #6f6a62;
-  --color-hairline: #ccbfa4;
+  /* Cyanotype palette (Phase 1) — faded blue-gray paper, Prussian-blue ink,
+     warm tan as secondary, oxide red as rubric for chapter numerals only.
+     Reference: 19th-century scientific plates (Anna Atkins, architectural
+     blueprints), with classical rubrication added for the codex frame. */
+  --color-canvas: #c9d4d6;
+  --color-ink: #0a1f2e;
+  --color-sepia: #a07246;
+  --color-marble: #b8c4c7;
+  --color-mute: #4a5e68;
+  --color-hairline: #94a4a8;
+  --color-rubric: #8a3a1f;
   --font-serif: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
