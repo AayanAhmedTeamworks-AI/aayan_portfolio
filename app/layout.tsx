@@ -9,6 +9,7 @@ import { MeanderLoader } from "@/components/meander-loader";
 import { LenisRoot } from "@/components/lenis-root";
 import { Cursor } from "@/components/cursor";
 import { CursorPrelude } from "@/components/cursor-prelude";
+import { Spotlight } from "@/components/spotlight";
 import { DustLayer } from "@/components/dust-layer";
 import { PageTransition } from "@/components/page-transition";
 
@@ -44,6 +45,7 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-canvas text-ink font-sans antialiased grain-overlay">
         <LenisRoot>
+          <Spotlight />
           <Cursor />
           <CursorPrelude />
           <DustLayer />
