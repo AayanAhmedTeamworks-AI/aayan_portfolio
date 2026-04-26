@@ -3,7 +3,8 @@ import { ChapterProgress } from "@/components/chapter-progress";
 import { ChapterCover } from "@/components/chapter-cover";
 import Colophon from "@/components/colophon";
 import { ReadingFocus } from "@/components/reading-focus";
-import { Reveal } from "@/components/reveal";
+import { ScrollFlipCard } from "@/components/scroll-flip-card";
+import { TiltCard } from "@/components/tilt-card";
 
 type ApparatusStatus =
   | "in praeparatione"
@@ -69,9 +70,16 @@ export default function Experimenta() {
 
         <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-8">
           {apparatus.map((a, i) => (
-            <Reveal key={a.numeral} delay={i * 100}>
-              <ApparatusCard a={a} />
-            </Reveal>
+            <ScrollFlipCard
+              key={a.numeral}
+              delay={0.3 + i * 0.18}
+              duration={1.6}
+              travel={140}
+            >
+              <TiltCard className="h-full" max={5}>
+                <ApparatusCard a={a} />
+              </TiltCard>
+            </ScrollFlipCard>
           ))}
         </div>
 
