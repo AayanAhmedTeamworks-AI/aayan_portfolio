@@ -3,6 +3,8 @@ import { BustShadow } from "@/components/bust-shadow";
 import { Reveal } from "@/components/reveal";
 import { Meander } from "@/components/meander";
 import { VTLink } from "@/components/vt-link";
+import { HeroInkType } from "@/components/hero-ink-type";
+import { MarqueeRibbon } from "@/components/marquee-ribbon";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 
 const chapters = [
@@ -78,9 +80,13 @@ export default function Home() {
                 Codex · MMXXVI · Friedberg / Ingolstadt
               </p>
               <h1 className="font-serif text-[clamp(3.5rem,9.5vw,9rem)] leading-[0.92] tracking-[-0.04em] text-ink">
-                Syed Aayan
+                <HeroInkType text="Syed Aayan" />
                 <br />
-                <span className="italic text-sepia/95">Ahmed.</span>
+                <HeroInkType
+                  text="Ahmed."
+                  delay={0.95}
+                  className="italic text-sepia/95"
+                />
               </h1>
               <p className="font-serif italic text-2xl md:text-[1.75rem] leading-[1.2] text-ink/75 mt-10 max-w-[26ch] tracking-[-0.01em]">
                 Engineer of durable AI systems — making LLMs boring, on
@@ -108,6 +114,17 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <MarqueeRibbon
+        items={[
+          "Ad fontes",
+          "Festina lente",
+          "Verba volant, scripta manent",
+          "Nulla dies sine linea",
+          "Per aspera ad astra",
+          "MMXXVI · Friedberg · Ingolstadt",
+        ]}
+      />
 
       {/* Chapters Index */}
       <section className="relative max-w-[90rem] mx-auto px-8 md:px-16 py-32 md:py-40">

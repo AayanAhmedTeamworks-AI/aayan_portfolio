@@ -2,8 +2,7 @@ import { ChapterProgress } from "@/components/chapter-progress";
 import { ChapterCover } from "@/components/chapter-cover";
 import Colophon from "@/components/colophon";
 import { PageTurn } from "@/components/page-turn";
-import { ReadingFocus } from "@/components/reading-focus";
-import { Reveal } from "@/components/reveal";
+import { CardStack3D } from "@/components/card-stack-3d";
 
 const pieces = [
   {
@@ -29,48 +28,58 @@ const pieces = [
   },
 ];
 
+const ROMAN = ["i", "ii", "iii"];
+
 export default function Studia() {
+  const cards = pieces.map((p, i) => (
+    <article
+      key={p.title}
+      className="h-full w-full rounded-2xl bg-marble/40 ring-1 ring-hairline p-2"
+    >
+      <div
+        className="h-full rounded-[calc(1rem-6px)] bg-canvas/80 p-8 md:p-10 flex flex-col"
+        style={{
+          boxShadow:
+            "inset 0 0 40px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.3)",
+        }}
+      >
+        <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
+          {p.kind}
+        </p>
+        <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-sepia/85">
+          {p.year}
+        </p>
+        <h2 className="font-serif text-[1.85rem] md:text-[2.25rem] tracking-[-0.02em] leading-[1.05] text-ink mt-10">
+          {p.title}
+        </h2>
+        <p className="mt-6 text-[14px] leading-[1.7] text-ink/75 flex-1">
+          {p.blurb}
+        </p>
+        <div className="mt-auto pt-8 flex items-center gap-3">
+          <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-mute">
+            Studia
+          </span>
+          <span className="h-px bg-hairline flex-1" />
+          <span className="font-serif italic text-sepia/70 text-sm">
+            {ROMAN[i]}
+          </span>
+        </div>
+      </div>
+    </article>
+  ));
+
   return (
     <>
       <ChapterProgress />
-      <ReadingFocus selector="[data-reading-focus] p" />
       <div className="max-w-[90rem] mx-auto px-8 md:px-16 pt-32 pb-16">
         <ChapterCover
           numeral="II"
           chapter="Studia"
           label="Research & study"
-          tagline="Questions pulled at, sometimes answered. Some self-initiated, some coursework at THI Ingolstadt."
+          tagline="Questions pulled at, sometimes answered. Some self-initiated, some coursework at THI Ingolstadt. Use ← → to leaf through."
         />
 
-        <ul
-          data-reading-focus
-          className="mt-20 divide-y divide-hairline border-t border-hairline"
-        >
-          {pieces.map((p, i) => (
-            <li key={p.title}>
-              <Reveal delay={i * 100}>
-                <article className="py-12 md:py-16 grid grid-cols-1 md:grid-cols-12 gap-8">
-                  <div className="md:col-span-3">
-                    <p className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
-                      {p.kind}
-                    </p>
-                    <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.28em] text-sepia/85">
-                      {p.year}
-                    </p>
-                  </div>
-                  <div className="md:col-span-9">
-                    <h2 className="font-serif text-4xl md:text-5xl tracking-[-0.025em] leading-[1] text-ink">
-                      {p.title}
-                    </h2>
-                    <p className="mt-6 text-[15px] leading-[1.75] text-ink/75 max-w-[62ch]">
-                      {p.blurb}
-                    </p>
-                  </div>
-                </article>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+        <CardStack3D cards={cards} className="mt-24" />
 
         <Colophon numeral="II" />
       </div>
