@@ -34,7 +34,7 @@ export function Spotlight() {
     const el = ref.current;
     if (!el) return;
 
-    gsap.set(el, { x: -9999, y: -9999, opacity: 0 });
+    gsap.set(el, { x: -9999, y: -9999, opacity: 0, scale: 1 });
     const sx = gsap.quickTo(el, "x", { duration: 0.38, ease: "power3" });
     const sy = gsap.quickTo(el, "y", { duration: 0.38, ease: "power3" });
 
@@ -55,12 +55,38 @@ export function Spotlight() {
       firstMove = true;
     };
 
+    // Bloom — page-emitted curator-turning-on-the-spotlight beat. Triggered
+    // by ClosingPortrait at the bottom of Vita; harmless elsewhere.
+    const onBloom = (e: Event) => {
+      const detail = (e as CustomEvent<{
+        duration?: number;
+        scale?: number;
+      }>).detail;
+      const dur = (detail?.duration ?? 900) / 1000;
+      const peak = detail?.scale ?? 1.5;
+      gsap.killTweensOf(el, "scale");
+      gsap.to(el, {
+        scale: peak,
+        duration: dur * 0.45,
+        ease: "power2.out",
+        onComplete: () => {
+          gsap.to(el, {
+            scale: 1,
+            duration: dur * 0.55,
+            ease: "power2.inOut",
+          });
+        },
+      });
+    };
+
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("mouseleave", onLeave);
+    window.addEventListener("spotlight:bloom", onBloom);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("spotlight:bloom", onBloom);
     };
   }, [enabled]);
 
