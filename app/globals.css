@@ -160,6 +160,56 @@
   will-change: transform, opacity;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   Background caustic — drifting marble-light effect for use behind
+   colophons and endplates. Pure CSS, GPU-composited, two rotating
+   layers of large blurred radial gradients in sepia.
+   ══════════════════════════════════════════════════════════════ */
+.caustic-layer {
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(180, 142, 90, 0.18), transparent 30%),
+    radial-gradient(circle at 78% 72%, rgba(139, 107, 63, 0.15), transparent 32%),
+    radial-gradient(circle at 50% 50%, rgba(201, 163, 114, 0.12), transparent 38%),
+    radial-gradient(circle at 35% 80%, rgba(180, 142, 90, 0.1), transparent 30%);
+  filter: blur(48px);
+  will-change: transform;
+}
+
+.caustic-layer-a {
+  animation: caustic-drift-a 32s linear infinite;
+}
+
+.caustic-layer-b {
+  animation: caustic-drift-b 44s linear infinite;
+  opacity: 0.65;
+}
+
+@keyframes caustic-drift-a {
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+  100% {
+    transform: rotate(360deg) translateX(28px);
+  }
+}
+
+@keyframes caustic-drift-b {
+  0% {
+    transform: rotate(0deg) translateX(0) scale(1.05);
+  }
+  100% {
+    transform: rotate(-360deg) translateX(-22px) scale(0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caustic-layer {
+    animation: none;
+  }
+}
+
 /* Very slow, very subtle warm glow behind frontispiece — adds depth, not spectacle */
 .ambient-glow {
   position: absolute;
