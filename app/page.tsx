@@ -37,12 +37,30 @@ const chapters = [
   },
   {
     numeral: "IV",
+    name: "Vita",
+    slug: "/vita",
+    blurb:
+      "The author of this codex, briefly. Twenty-four years; a practical study semester at THI Ingolstadt; a stubborn belief that integration is worth more than invention.",
+    meta: "One author",
+    ref: "CAT. IV — VITA",
+  },
+  {
+    numeral: "V",
     name: "Contactus",
     slug: "/contactus",
     blurb:
       "Get in touch. Open to thesis collaboration, DACH-SME automation engagements, and thoughtful internship continuations.",
     meta: "Get in touch",
-    ref: "CAT. IV — LETTER",
+    ref: "CAT. V — LETTER",
+  },
+  {
+    numeral: "VI",
+    name: "Experimenta",
+    slug: "/experimenta",
+    blurb:
+      "Live demonstrations and working drafts. Tokenizer comparisons, retrieval over the codex, and apparatus in preparation.",
+    meta: "In preparation",
+    ref: "CAT. VI — APPARATUS",
   },
 ];
 

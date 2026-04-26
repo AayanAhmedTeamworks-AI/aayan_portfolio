@@ -78,11 +78,19 @@
 .chapter-numeral-iv {
   view-transition-name: chapter-numeral-iv;
 }
+.chapter-numeral-v {
+  view-transition-name: chapter-numeral-v;
+}
+.chapter-numeral-vi {
+  view-transition-name: chapter-numeral-vi;
+}
 
 ::view-transition-group(chapter-numeral-i),
 ::view-transition-group(chapter-numeral-ii),
 ::view-transition-group(chapter-numeral-iii),
-::view-transition-group(chapter-numeral-iv) {
+::view-transition-group(chapter-numeral-iv),
+::view-transition-group(chapter-numeral-v),
+::view-transition-group(chapter-numeral-vi) {
   animation-duration: 560ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }

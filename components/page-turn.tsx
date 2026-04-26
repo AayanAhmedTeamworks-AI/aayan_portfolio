@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { Meander } from "@/components/meander";
+import { BackgroundCaustic } from "@/components/background-caustic";
 import { scrollProgressRef } from "@/lib/scroll-progress";
 
 type Props = {
@@ -63,12 +64,13 @@ export function PageTurn({
 
   return (
     <div
-      className="relative min-h-[60vh] flex flex-col items-center justify-center mt-24"
+      className="relative min-h-[60vh] flex flex-col items-center justify-center mt-24 overflow-hidden"
       style={{ perspective: "1500px" }}
     >
+      <BackgroundCaustic />
       <div
         ref={curlRef}
-        className="max-w-2xl mx-auto text-center will-change-transform"
+        className="relative max-w-2xl mx-auto text-center will-change-transform"
         style={{
           transformStyle: "preserve-3d",
           transformOrigin: "bottom center",
