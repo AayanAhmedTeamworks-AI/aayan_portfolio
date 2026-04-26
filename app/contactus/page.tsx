@@ -5,6 +5,7 @@ import { PageTurn } from "@/components/page-turn";
 import { ArrowCTA } from "@/components/arrow-cta";
 import { BackgroundMarquee } from "@/components/background-marquee";
 import { MagneticButton } from "@/components/magnetic-button";
+import { ScrollFlipCard } from "@/components/scroll-flip-card";
 
 export default function Contactus() {
   return (
@@ -18,10 +19,18 @@ export default function Contactus() {
           tagline="Best reached by email. I reply in English or German. Occasionally slow, always honest."
         />
 
-        {/* High-impact CTA — the whole page is the CTA. */}
-        <section className="relative my-24 min-h-[58vh] flex items-center justify-center overflow-hidden">
-          <BackgroundMarquee text="Scribe mihi" speed={20} opacity={0.07} />
-          <div className="relative z-10 text-center px-4 w-full">
+        {/* Billboard CTA — name as background marquee, card flips in
+            from below over it like a postcard dealt onto the table. */}
+        <section className="relative my-24 min-h-[64vh] flex items-center justify-center overflow-hidden">
+          <BackgroundMarquee
+            text="Syed Aayan Ahmed"
+            speed={18}
+            opacity={0.07}
+          />
+          <ScrollFlipCard
+            delay={1.4}
+            className="relative z-10 text-center px-4 w-full"
+          >
             <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-sepia mb-8">
               ¶ Epistola
             </p>
@@ -52,7 +61,7 @@ export default function Contactus() {
             <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.22em] text-mute/80">
               Friedberg · Ingolstadt · MMXXVI
             </p>
-          </div>
+          </ScrollFlipCard>
         </section>
 
         <Colophon numeral="V" />
