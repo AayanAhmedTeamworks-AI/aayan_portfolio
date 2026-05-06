@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroFluid } from "@/components/hero-fluid";
@@ -9,8 +10,10 @@ import { HeroFluid } from "@/components/hero-fluid";
  * behind everything. The painted backdrop in a Caravaggio: figure carved
  * out of dark ink-stained void by a single light.
  *
- * Phase 1: fluid running, no bust composite yet — verifying the backdrop
- * reads as ink on canvas before adding the figure layer.
+ * Phase 2: bust composite. The bust photo sits off-axis right, masked
+ * with a radial vignette so its edges fade into the ink rather than
+ * reading as a hard rectangle. Subtle scroll-driven settle and parallax;
+ * the bust drifts slightly slower than the name as you scroll out.
  */
 export function Frontispiece() {
   const ref = useRef<HTMLDivElement>(null);
@@ -18,7 +21,10 @@ export function Frontispiece() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  const nameY = useTransform(scrollYProgress, [0, 1], ["0%", "-12%"]);
+  const nameY = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
+  const bustY = useTransform(scrollYProgress, [0, 1], ["0%", "-9%"]);
+  const bustScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
+  const bustOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.5]);
   const fluidOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.4]);
 
   return (
@@ -41,7 +47,7 @@ export function Frontispiece() {
 
         {/* Layer 1 — soft canvas wash on the left third for legibility of
             the name. Right two-thirds untouched, so the ink reads loud
-            there and the figure (Phase 2) lands in clean ink. */}
+            there and the bust lands in clean ink. */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-[1] pointer-events-none"
@@ -51,14 +57,14 @@ export function Frontispiece() {
           }}
         />
 
-        {/* Layer 2 — content. Off-axis right composition is implied by
-            grid: name takes the left half, the right half is reserved for
-            the bust (Phase 2) and reads as backdrop in Phase 1. */}
+        {/* Layer 2 — content. Off-axis right composition: name takes the
+            left half, bust sits flush-right inside its column with the
+            radial vignette so its edges dissolve into the ink. */}
         <motion.div
           style={{ y: nameY }}
           className="relative z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-center gap-10 px-8 pb-16 pt-32 md:grid-cols-12 md:px-16"
         >
-          <div className="md:col-span-6 lg:col-span-7">
+          <div className="md:col-span-7">
             <motion.p
               initial={{ y: -24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -112,8 +118,51 @@ export function Frontispiece() {
             </motion.div>
           </div>
 
-          {/* Right column reserved for bust (Phase 2). Empty in Phase 1. */}
-          <div className="hidden md:col-span-6 lg:col-span-5 md:block" />
+          {/* Right column — bust off-axis right, vignette-masked */}
+          <motion.div
+            style={{ y: bustY, scale: bustScale, opacity: bustOpacity }}
+            className="hidden md:col-span-5 md:flex items-center justify-end self-stretch"
+          >
+            <div className="relative w-full max-w-md aspect-[3/4]">
+              {/* Subtle warm glow behind bust — pulls it forward of the ink */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-10"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 50% 44% at 50% 50%, rgba(201,163,114,0.12) 0%, rgba(139,107,63,0.04) 42%, transparent 72%)",
+                }}
+              />
+              {/* Bust — clip-path reveal from below on mount, radial mask
+                  so edges dissolve into the ink (Caravaggio framing). */}
+              <motion.div
+                initial={{ clipPath: "inset(0 0 100% 0)" }}
+                animate={{ clipPath: "inset(0 0 0% 0)" }}
+                transition={{
+                  duration: 1.4,
+                  delay: 0.85,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="relative h-full w-full"
+              >
+                <Image
+                  src="/bust.png"
+                  alt="Sculpted marble portrait"
+                  fill
+                  priority
+                  quality={92}
+                  sizes="(max-width: 768px) 0px, 440px"
+                  className="object-contain"
+                  style={{
+                    WebkitMaskImage:
+                      "radial-gradient(ellipse 58% 68% at 50% 52%, #000 58%, transparent 95%)",
+                    maskImage:
+                      "radial-gradient(ellipse 58% 68% at 50% 52%, #000 58%, transparent 95%)",
+                  }}
+                />
+              </motion.div>
+            </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
