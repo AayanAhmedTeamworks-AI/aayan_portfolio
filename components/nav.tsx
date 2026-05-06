@@ -1,42 +1,22 @@
 import Link from "next/link";
-import { VTLink } from "./vt-link";
 
-const items = [
-  { label: "Praxis", numeral: "I", href: "/praxis" },
-  { label: "Studia", numeral: "II", href: "/studia" },
-  { label: "Civitas", numeral: "III", href: "/civitas" },
-  { label: "Vita", numeral: "IV", href: "/vita" },
-  { label: "Contactus", numeral: "V", href: "/contactus" },
-  { label: "Experimenta", numeral: "VI", href: "/experimenta" },
-];
-
+/**
+ * Single-page-architecture nav. No section list — the page is one continuous
+ * scroll, and section labels would just be reinventing chapter pages in
+ * miniature. Brand on the left, year on the right, hairline beneath.
+ */
 export function Nav() {
   return (
-    <header className="fixed top-0 inset-x-0 z-30 bg-canvas/75 backdrop-blur-md border-b border-hairline/60">
+    <header className="fixed top-0 inset-x-0 z-30 bg-canvas/70 backdrop-blur-md border-b border-hairline/60">
       <nav className="max-w-[90rem] mx-auto px-6 md:px-10 h-14 flex items-center justify-between">
         <Link
           href="/"
           className="font-serif text-[17px] tracking-tight text-ink hover:text-sepia transition-colors duration-300"
+          data-cursor="Top"
         >
           <span className="italic">Codex</span> Ahmed
         </Link>
-        <ul className="hidden md:flex items-center gap-5 lg:gap-7">
-          {items.map((it) => (
-            <li key={it.href}>
-              <VTLink
-                href={it.href}
-                data-cursor-destination={it.numeral}
-                className="group flex items-baseline gap-2 font-mono text-[10.5px] uppercase tracking-[0.18em] text-mute hover:text-ink transition-colors duration-300"
-              >
-                <span className="font-serif italic text-sepia/75 text-sm">
-                  {it.numeral}
-                </span>
-                <span>{it.label}</span>
-              </VTLink>
-            </li>
-          ))}
-        </ul>
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-mute hidden md:inline">
+        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-mute hidden sm:inline">
           MMXXVI
         </span>
       </nav>
