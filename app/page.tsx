@@ -1,4 +1,5 @@
 import { Frontispiece } from "@/components/frontispiece";
+import { MuseumTransition } from "@/components/museum-transition";
 import { SectionIntro } from "@/components/section-intro";
 import { VitaSection } from "@/components/vita-section";
 import { WorkBillboard } from "@/components/work-billboard";
@@ -12,11 +13,10 @@ export default function Home() {
     <>
       <Frontispiece />
 
-      <SectionIntro
-        numeral="i"
-        title="Vita"
-        tagline="A self-portrait, in his own words."
-      />
+      {/* Cinematic bridge: bust grows → curtain opens → Berlin photo
+          revealed → first sentence emerges. Replaces a static chapter
+          intro for Vita with a scroll-driven film cut. */}
+      <MuseumTransition />
       <VitaSection />
 
       <SectionIntro
@@ -43,7 +43,7 @@ export default function Home() {
         src="/bust.png"
         alt="Sculpted marble portrait of Syed Aayan Ahmed"
         caption="MMXXVI"
-        figureLabel="fig. iv"
+        figureLabel="fig. iii"
       />
 
       <SectionIntro

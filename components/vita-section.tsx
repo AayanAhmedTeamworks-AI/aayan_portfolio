@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { PortraitNiche } from "@/components/portrait-niche";
 import { ScrollProse } from "@/components/scroll-prose";
 import { Emphasis } from "@/components/emphasis";
@@ -7,42 +6,27 @@ import { Emphasis } from "@/components/emphasis";
  * Vita section — first-person self-portrait. Each paragraph is a
  * <ScrollProse/> block: words brighten one at a time against the fixed
  * canvas as the reader scrolls through. Three pull-quote underlines mark
- * the load-bearing sentences. Four photos as plates between paragraph
- * blocks.
+ * the load-bearing sentences. Photos as plates between paragraph blocks.
+ *
+ * The Berlin photo + opening sentence ("My name is Syed Aayan Ahmed.")
+ * have moved into <MuseumTransition/> — Vita prose now picks up from
+ * the second sentence onward.
  */
 export function VitaSection() {
   return (
     <section
       id="vita"
-      className="relative w-full pt-24 pb-16"
+      className="relative w-full pt-12 pb-16"
       data-cursor="Read"
     >
-      {/* Hero — Berlin U-Bahn, full-width cinematic plate */}
-      <figure className="relative mx-auto max-w-5xl px-4 md:px-8">
-        <div className="relative aspect-[3/4] md:aspect-[4/3] w-full overflow-hidden rounded-lg ring-1 ring-hairline bg-marble/40">
-          <Image
-            src="/portrait-berlin.jpg"
-            alt="Syed Aayan Ahmed on a Berlin U-Bahn platform"
-            fill
-            sizes="(max-width: 768px) 100vw, 1024px"
-            quality={92}
-            className="object-cover grayscale-[6%] contrast-[1.02]"
-          />
-        </div>
-        <figcaption className="mt-4 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-[0.28em] text-mute">
-          <span>Berlin · MMXXVI</span>
-          <span className="text-sepia/80">fig. i</span>
-        </figcaption>
-      </figure>
-
       {/* Prose column — word-by-word scroll-linked brightening */}
-      <div className="mx-auto mt-24 max-w-[60ch] px-8 md:px-0 font-serif text-[19px] md:text-[21px] leading-[1.65] text-ink space-y-9">
+      <div className="mx-auto max-w-[60ch] px-8 md:px-0 font-serif text-[19px] md:text-[21px] leading-[1.65] text-ink space-y-9">
         <ScrollProse>
-          My name is Syed Aayan Ahmed. I was born in India and moved to
-          Germany at twenty-one for an undergrad I had no business
-          expecting to finish. Three and a half years later I&apos;m still
-          here, in a flat on Gerbergasse with a fake lemon, two windows,
-          and a habit of eating pizza brötchen at two in the morning.
+          I was born in India and moved to Germany at twenty-one for an
+          undergrad I had no business expecting to finish. Three and a half
+          years later I&apos;m still here, in a flat on Gerbergasse with a
+          fake lemon, two windows, and a habit of eating pizza brötchen at
+          two in the morning.
         </ScrollProse>
 
         <ScrollProse>
@@ -79,7 +63,7 @@ export function VitaSection() {
           width={900}
           height={1200}
           caption="València · MMXXV"
-          figureLabel="fig. ii"
+          figureLabel="fig. i"
           variant="plate"
         />
       </div>
@@ -109,7 +93,7 @@ export function VitaSection() {
           width={1932}
           height={2576}
           caption="Gerbergasse · late"
-          figureLabel="fig. iii"
+          figureLabel="fig. ii"
           variant="plate"
         />
       </div>
