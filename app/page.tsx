@@ -1,5 +1,4 @@
 import { Frontispiece } from "@/components/frontispiece";
-import { MuseumTransition } from "@/components/museum-transition";
 import { SectionIntro } from "@/components/section-intro";
 import { VitaSection } from "@/components/vita-section";
 import { WorkBillboard } from "@/components/work-billboard";
@@ -11,12 +10,11 @@ import { LabSection } from "@/components/lab-section";
 export default function Home() {
   return (
     <>
+      {/* Hero + cinematic transition combined. Frontispiece is one
+          440vh sticky section: hero → bust grows → curtain opens →
+          Berlin emerges → first sentence. Same bust DOM element
+          throughout. */}
       <Frontispiece />
-
-      {/* Cinematic bridge: bust grows → curtain opens → Berlin photo
-          revealed → first sentence emerges. Replaces a static chapter
-          intro for Vita with a scroll-driven film cut. */}
-      <MuseumTransition />
       <VitaSection />
 
       <SectionIntro
