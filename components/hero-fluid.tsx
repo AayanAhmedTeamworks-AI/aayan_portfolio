@@ -36,7 +36,7 @@ const INK_COLOR: [number, number, number] = [0.26, 0.21, 0.14];
 
 const VERTEX = `#version 300 es
 precision highp float;
-in vec2 a_position;
+layout(location = 0) in vec2 a_position;
 out vec2 v_uv;
 out vec2 v_l;
 out vec2 v_r;
@@ -262,14 +262,16 @@ function compileShader(
   gl: WebGL2RenderingContext,
   type: number,
   source: string,
+  label: string,
 ): WebGLShader {
   const shader = gl.createShader(type)!;
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const log = gl.getShaderInfoLog(shader);
+    console.error(`[HeroFluid] shader compile failed (${label}):`, log);
     gl.deleteShader(shader);
-    throw new Error("Shader compile error: " + log);
+    throw new Error(`Shader compile error (${label}): ` + log);
   }
   return shader;
 }
@@ -277,16 +279,18 @@ function compileShader(
 function createProgram(
   gl: WebGL2RenderingContext,
   fragSource: string,
+  label: string,
 ): Program {
-  const vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX);
-  const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragSource);
+  const vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX, `${label}.vs`);
+  const fs = compileShader(gl, gl.FRAGMENT_SHADER, fragSource, `${label}.fs`);
   const prog = gl.createProgram()!;
   gl.attachShader(prog, vs);
   gl.attachShader(prog, fs);
   gl.linkProgram(prog);
   if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
     const log = gl.getProgramInfoLog(prog);
-    throw new Error("Program link error: " + log);
+    console.error(`[HeroFluid] program link failed (${label}):`, log);
+    throw new Error(`Program link error (${label}): ` + log);
   }
   const count = gl.getProgramParameter(prog, gl.ACTIVE_UNIFORMS);
   const uniforms: Record<string, WebGLUniformLocation | null> = {};
@@ -429,22 +433,19 @@ class FluidSim {
     });
     if (!gl) throw new Error("WebGL2 not supported");
     this.gl = gl;
-    gl.getExtension("EXT_color_buffer_float");
-    const linearFloat = gl.getExtension("OES_texture_float_linear");
-    const linearHalfFloat = gl.getExtension("OES_texture_half_float_linear");
-
-    // Prefer half-float when linear filtering is available; else fall back
-    if (linearHalfFloat || linearFloat) {
-      this.internalFormat = gl.RGBA16F;
-      this.internalFormatRG = gl.RG16F;
-      this.internalFormatR = gl.R16F;
-      this.floatType = gl.HALF_FLOAT;
-    } else {
-      this.internalFormat = gl.RGBA16F;
-      this.internalFormatRG = gl.RG16F;
-      this.internalFormatR = gl.R16F;
-      this.floatType = gl.HALF_FLOAT;
+    const colorBufferFloat = gl.getExtension("EXT_color_buffer_float");
+    if (!colorBufferFloat) {
+      console.warn(
+        "[HeroFluid] EXT_color_buffer_float not available — fluid sim may render incorrectly",
+      );
     }
+    gl.getExtension("OES_texture_float_linear");
+    gl.getExtension("OES_texture_half_float_linear");
+
+    this.internalFormat = gl.RGBA16F;
+    this.internalFormatRG = gl.RG16F;
+    this.internalFormatR = gl.R16F;
+    this.floatType = gl.HALF_FLOAT;
 
     this.initVAO();
     this.initPrograms();
@@ -483,23 +484,19 @@ class FluidSim {
   private initPrograms() {
     const gl = this.gl;
     this.programs = {
-      splat: createProgram(gl, SPLAT),
-      advection: createProgram(gl, ADVECTION),
-      divergence: createProgram(gl, DIVERGENCE),
-      pressure: createProgram(gl, PRESSURE),
-      gradSubtract: createProgram(gl, GRAD_SUBTRACT),
-      curl: createProgram(gl, CURL_FS),
-      vorticity: createProgram(gl, VORTICITY),
-      clear: createProgram(gl, CLEAR),
-      display: createProgram(gl, DISPLAY),
-      glyphInject: createProgram(gl, GLYPH_INJECT),
+      splat: createProgram(gl, SPLAT, "splat"),
+      advection: createProgram(gl, ADVECTION, "advection"),
+      divergence: createProgram(gl, DIVERGENCE, "divergence"),
+      pressure: createProgram(gl, PRESSURE, "pressure"),
+      gradSubtract: createProgram(gl, GRAD_SUBTRACT, "gradSubtract"),
+      curl: createProgram(gl, CURL_FS, "curl"),
+      vorticity: createProgram(gl, VORTICITY, "vorticity"),
+      clear: createProgram(gl, CLEAR, "clear"),
+      display: createProgram(gl, DISPLAY, "display"),
+      glyphInject: createProgram(gl, GLYPH_INJECT, "glyphInject"),
     };
-    // Bind attribute location for "a_position" — we use layout(location=0)
-    // implicit via VAO + a_position in vertex shader.
-    for (const p of Object.values(this.programs)) {
-      gl.bindAttribLocation(p.prog, 0, "a_position");
-      gl.linkProgram(p.prog);
-    }
+    // a_position is bound to location 0 via `layout(location = 0)` in the
+    // vertex shader, matching the VAO's vertexAttribPointer(0, …).
   }
 
   private initFBOs() {
