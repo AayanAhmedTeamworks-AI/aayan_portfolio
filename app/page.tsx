@@ -1,4 +1,5 @@
 import { Frontispiece } from "@/components/frontispiece";
+import { SectionIntro } from "@/components/section-intro";
 import { VitaSection } from "@/components/vita-section";
 import { WorkBillboard } from "@/components/work-billboard";
 import { PersonalProjects } from "@/components/personal-projects";
@@ -10,15 +11,46 @@ export default function Home() {
   return (
     <>
       <Frontispiece />
+
+      <SectionIntro
+        numeral="i"
+        title="Vita"
+        tagline="A self-portrait, in his own words."
+      />
       <VitaSection />
+
+      <SectionIntro
+        numeral="ii"
+        title="The work"
+        tagline="Five things I built — most of them in production. Two diagrams that show what they actually do."
+      />
       <WorkBillboard />
+
+      <SectionIntro
+        numeral="iii"
+        title="Made on my own"
+        tagline="Things I made for an audience of about three. I'm proud of them anyway."
+      />
       <PersonalProjects />
+
+      <SectionIntro
+        numeral="iv"
+        title="How to reach me"
+        tagline="Open to thesis collaboration, DACH-SME automation, and thoughtful internships."
+      />
       <ContactSection />
+
       <ClosingPortrait
         src="/bust.png"
         alt="Sculpted marble portrait of Syed Aayan Ahmed"
         caption="MMXXVI"
         figureLabel="fig. iv"
+      />
+
+      <SectionIntro
+        numeral="v"
+        title="The lab"
+        tagline="Things you can play with. No API keys, no telemetry — the demos run in your browser."
       />
       <LabSection />
     </>

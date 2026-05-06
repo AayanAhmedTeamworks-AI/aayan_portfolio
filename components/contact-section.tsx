@@ -13,15 +13,6 @@ export function ContactSection() {
       className="relative w-full pt-24 pb-24"
       data-cursor="Read"
     >
-      <header className="mx-auto max-w-[60ch] px-8 md:px-0 mb-14">
-        <div className="flex items-baseline gap-3 border-b border-hairline pb-4">
-          <span className="font-serif italic text-sepia/70 text-lg">iv.</span>
-          <h2 className="font-serif text-2xl md:text-3xl tracking-[-0.02em] text-ink">
-            How to reach me
-          </h2>
-        </div>
-      </header>
-
       <div className="mx-auto max-w-[60ch] px-8 md:px-0">
         <p className="font-serif text-[clamp(2.2rem,5.6vw,4rem)] leading-[1.05] tracking-[-0.03em] text-ink">
           Open to thesis collaboration, DACH-SME automation, and{" "}

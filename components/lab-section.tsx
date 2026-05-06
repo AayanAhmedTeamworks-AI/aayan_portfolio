@@ -13,19 +13,6 @@ export function LabSection() {
       className="relative w-full bg-marble/35 ring-1 ring-inset ring-hairline/60 py-24 md:py-32"
       data-cursor="Play"
     >
-      <header className="mx-auto max-w-5xl px-8 md:px-12 mb-12">
-        <div className="flex items-baseline gap-3 border-b border-hairline pb-4">
-          <span className="font-serif italic text-sepia/70 text-lg">v.</span>
-          <h2 className="font-serif text-2xl md:text-3xl tracking-[-0.02em] text-ink">
-            The lab
-          </h2>
-        </div>
-        <p className="mt-4 font-serif italic text-mute text-base max-w-[60ch]">
-          A wing of the gallery where things are still being installed. No
-          API keys, no telemetry &mdash; the demos run in your browser.
-        </p>
-      </header>
-
       <div className="mx-auto max-w-5xl px-4 md:px-8">
         <article>
           <div className="flex items-baseline gap-3 mb-2">

@@ -12,19 +12,6 @@ export function PersonalProjects() {
       className="relative w-full pt-24 pb-24"
       data-cursor="Read"
     >
-      <header className="mx-auto max-w-[60ch] px-8 md:px-0 mb-14">
-        <div className="flex items-baseline gap-3 border-b border-hairline pb-4">
-          <span className="font-serif italic text-sepia/70 text-lg">iii.</span>
-          <h2 className="font-serif text-2xl md:text-3xl tracking-[-0.02em] text-ink">
-            Things I made on my own
-          </h2>
-        </div>
-        <p className="mt-4 font-serif italic text-mute text-base">
-          Most of these ran for an audience of about three. I&apos;m proud of
-          them anyway.
-        </p>
-      </header>
-
       <article className="mx-auto max-w-[60ch] px-8 md:px-0 font-serif text-[18px] md:text-[20px] leading-[1.65] text-ink/90 space-y-12">
         <div>
           <h3 className="font-serif text-xl tracking-[-0.01em] text-sepia/95 mb-3">
