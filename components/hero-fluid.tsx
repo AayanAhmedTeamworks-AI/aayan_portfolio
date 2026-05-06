@@ -27,8 +27,8 @@ const SPLAT_RADIUS = 0.22;
 const SPLAT_FORCE_CURSOR = 1400;
 const SPLAT_FORCE_AUTO = 1100;
 const AUTO_SPLAT_INTERVAL_MS = 3800;
-const GLYPH_INTERVAL_MS = 14000;
-const GLYPH_FIRST_DELAY_MS = 6500;
+const GLYPH_INTERVAL_MS = 9000;
+const GLYPH_FIRST_DELAY_MS = 3200;
 const GLYPHS = ["ॐ", "ع"];
 
 // Sepia (#c9a06a) ≈ rgb(0.789, 0.628, 0.416) — divided by ~3 for slow build-up
@@ -605,22 +605,37 @@ class FluidSim {
     const idx = Math.floor(Math.random() * this.glyphTextures.length);
     const tex = this.glyphTextures[idx];
 
-    // Random position biased to the right two-thirds (around the bust)
-    const cx = 0.46 + Math.random() * 0.36;
-    const cy = 0.34 + Math.random() * 0.32;
+    // Position the glyph in zones where the ink is actually visible —
+    // not buried behind the opaque centre of the bust photo. Three zones:
+    // above the bust, below the bust, in the gap to the bust's left.
+    const zone = Math.random();
+    let cx: number;
+    let cy: number;
+    if (zone < 0.34) {
+      // above the bust (upper half of the right two-thirds)
+      cx = 0.4 + Math.random() * 0.5;
+      cy = 0.8 + Math.random() * 0.13;
+    } else if (zone < 0.67) {
+      // below the bust
+      cx = 0.4 + Math.random() * 0.5;
+      cy = 0.08 + Math.random() * 0.13;
+    } else {
+      // gap between the name on the left and the bust on the right
+      cx = 0.4 + Math.random() * 0.16;
+      cy = 0.32 + Math.random() * 0.36;
+    }
 
-    // Scale: ~16-22% of canvas height. Compensate aspect so the glyph
+    // Scale: ~18-26% of canvas height. Compensate aspect so the glyph
     // is square in screen space.
-    const sy = 0.16 + Math.random() * 0.06;
+    const sy = 0.18 + Math.random() * 0.08;
     const sx = sy / aspect;
 
-    // Sepia color, brighter than auto-splat tone so the glyph reads
-    // briefly before the existing dye masks it.
-    const intensity = 0.85;
+    // Sepia, brighter — so glyph clearly reads against existing dye.
+    const intensity = 1.0;
     const color: [number, number, number] = [
-      Math.min(1.6, INK_COLOR[0] * intensity * 3.5),
-      Math.min(1.6, INK_COLOR[1] * intensity * 3.5),
-      Math.min(1.6, INK_COLOR[2] * intensity * 3.5),
+      Math.min(2.0, INK_COLOR[0] * intensity * 4.5),
+      Math.min(2.0, INK_COLOR[1] * intensity * 4.5),
+      Math.min(2.0, INK_COLOR[2] * intensity * 4.5),
     ];
 
     // Inject glyph into dye field
@@ -643,8 +658,9 @@ class FluidSim {
 
     // Small radial outward velocity burst around the glyph so it
     // immediately starts blooming into illegibility — eight tangents
-    // around a ring at half the glyph radius.
-    const burstForce = 320;
+    // around a ring at half the glyph radius. Gentler than auto-splats
+    // so the glyph stays recognisable for ~2s before dispersing.
+    const burstForce = 170;
     const ringRadius = sy * 0.45;
     for (let i = 0; i < 8; i++) {
       const angle = (i / 8) * Math.PI * 2;
