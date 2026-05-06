@@ -27,6 +27,9 @@ const SPLAT_RADIUS = 0.22;
 const SPLAT_FORCE_CURSOR = 1400;
 const SPLAT_FORCE_AUTO = 1100;
 const AUTO_SPLAT_INTERVAL_MS = 3800;
+const GLYPH_INTERVAL_MS = 14000;
+const GLYPH_FIRST_DELAY_MS = 6500;
+const GLYPHS = ["ॐ", "ع"];
 
 // Sepia (#c9a06a) ≈ rgb(0.789, 0.628, 0.416) — divided by ~3 for slow build-up
 const INK_COLOR: [number, number, number] = [0.26, 0.21, 0.14];
@@ -210,6 +213,26 @@ void main() {
   fragColor = vec4(c, 1.0);
 }`;
 
+const GLYPH_INJECT = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+uniform sampler2D u_target;
+uniform sampler2D u_glyph;
+uniform vec2 u_center;
+uniform vec2 u_scale;
+uniform vec3 u_color;
+out vec4 fragColor;
+void main() {
+  vec2 p = (v_uv - u_center) / u_scale + 0.5;
+  vec3 base = texture(u_target, v_uv).xyz;
+  vec3 add = vec3(0.0);
+  if (p.x >= 0.0 && p.x <= 1.0 && p.y >= 0.0 && p.y <= 1.0) {
+    float a = texture(u_glyph, p).a;
+    add = u_color * a;
+  }
+  fragColor = vec4(base + add, 1.0);
+}`;
+
 type Program = {
   prog: WebGLProgram;
   uniforms: Record<string, WebGLUniformLocation | null>;
@@ -367,6 +390,7 @@ class FluidSim {
     vorticity: Program;
     clear: Program;
     display: Program;
+    glyphInject: Program;
   };
   private velocity!: DoubleFBO;
   private dye!: DoubleFBO;
@@ -374,9 +398,11 @@ class FluidSim {
   private divergence!: FBO;
   private curl!: FBO;
   private vao!: WebGLVertexArrayObject;
+  private glyphTextures: WebGLTexture[] = [];
   private rafId = 0;
   private lastTime = 0;
   private lastAutoSplat = 0;
+  private lastGlyphInject = 0;
   private cursor = {
     x: -1,
     y: -1,
@@ -423,9 +449,13 @@ class FluidSim {
     this.initVAO();
     this.initPrograms();
     this.initFBOs();
+    this.initGlyphs();
     this.bindEvents();
     this.lastTime = performance.now();
     this.lastAutoSplat = this.lastTime;
+    // Stagger first glyph injection — wait GLYPH_FIRST_DELAY_MS after init
+    this.lastGlyphInject =
+      this.lastTime - GLYPH_INTERVAL_MS + GLYPH_FIRST_DELAY_MS;
     this.tick = this.tick.bind(this);
     this.rafId = requestAnimationFrame(this.tick);
 
@@ -462,6 +492,7 @@ class FluidSim {
       vorticity: createProgram(gl, VORTICITY),
       clear: createProgram(gl, CLEAR),
       display: createProgram(gl, DISPLAY),
+      glyphInject: createProgram(gl, GLYPH_INJECT),
     };
     // Bind attribute location for "a_position" — we use layout(location=0)
     // implicit via VAO + a_position in vertex shader.
@@ -520,6 +551,120 @@ class FluidSim {
       this.floatType,
       gl.NEAREST,
     );
+  }
+
+  private initGlyphs() {
+    const gl = this.gl;
+    if (typeof document === "undefined") return;
+    for (const g of GLYPHS) {
+      const tex = this.createGlyphTexture(g);
+      if (tex) this.glyphTextures.push(tex);
+    }
+  }
+
+  private createGlyphTexture(glyph: string): WebGLTexture | null {
+    const gl = this.gl;
+    const size = 384;
+    const c = document.createElement("canvas");
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext("2d");
+    if (!ctx) return null;
+    ctx.clearRect(0, 0, size, size);
+    ctx.fillStyle = "#fff";
+    ctx.font = `${Math.round(size * 0.72)}px "Times New Roman", "Noto Naskh Arabic", "Noto Sans Devanagari", serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(glyph, size / 2, size / 2);
+
+    const tex = gl.createTexture()!;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      c,
+    );
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    return tex;
+  }
+
+  private injectGlyph() {
+    const gl = this.gl;
+    if (this.glyphTextures.length === 0) return;
+    const aspect = this.canvas.width / this.canvas.height;
+
+    const idx = Math.floor(Math.random() * this.glyphTextures.length);
+    const tex = this.glyphTextures[idx];
+
+    // Random position biased to the right two-thirds (around the bust)
+    const cx = 0.46 + Math.random() * 0.36;
+    const cy = 0.34 + Math.random() * 0.32;
+
+    // Scale: ~16-22% of canvas height. Compensate aspect so the glyph
+    // is square in screen space.
+    const sy = 0.16 + Math.random() * 0.06;
+    const sx = sy / aspect;
+
+    // Sepia color, brighter than auto-splat tone so the glyph reads
+    // briefly before the existing dye masks it.
+    const intensity = 0.85;
+    const color: [number, number, number] = [
+      Math.min(1.6, INK_COLOR[0] * intensity * 3.5),
+      Math.min(1.6, INK_COLOR[1] * intensity * 3.5),
+      Math.min(1.6, INK_COLOR[2] * intensity * 3.5),
+    ];
+
+    // Inject glyph into dye field
+    const p = this.programs.glyphInject;
+    gl.useProgram(p.prog);
+    gl.uniform1i(p.uniforms["u_target"]!, this.dye.read.attach(0));
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.uniform1i(p.uniforms["u_glyph"]!, 1);
+    gl.uniform2f(p.uniforms["u_center"]!, cx, cy);
+    gl.uniform2f(p.uniforms["u_scale"]!, sx, sy);
+    gl.uniform3f(
+      p.uniforms["u_color"]!,
+      color[0],
+      color[1],
+      color[2],
+    );
+    this.blit(this.dye.write);
+    this.dye.swap();
+
+    // Small radial outward velocity burst around the glyph so it
+    // immediately starts blooming into illegibility — eight tangents
+    // around a ring at half the glyph radius.
+    const burstForce = 320;
+    const ringRadius = sy * 0.45;
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const px = cx + (Math.cos(angle) * ringRadius) / aspect;
+      const py = cy + Math.sin(angle) * ringRadius;
+      const dx = Math.cos(angle) * burstForce;
+      const dy = Math.sin(angle) * burstForce;
+      const sp = this.programs.splat;
+      gl.useProgram(sp.prog);
+      gl.uniform1i(
+        sp.uniforms["u_target"]!,
+        this.velocity.read.attach(0),
+      );
+      gl.uniform1f(sp.uniforms["u_aspectRatio"]!, aspect);
+      gl.uniform2f(sp.uniforms["u_point"]!, px, py);
+      gl.uniform3f(sp.uniforms["u_color"]!, dx, dy, 0);
+      gl.uniform1f(sp.uniforms["u_radius"]!, (SPLAT_RADIUS / 100) * 0.4);
+      this.blit(this.velocity.write);
+      this.velocity.swap();
+    }
   }
 
   private getResolution(target: number) {
@@ -833,6 +978,11 @@ class FluidSim {
     if (now - this.lastAutoSplat >= AUTO_SPLAT_INTERVAL_MS) {
       this.autoSplat();
       this.lastAutoSplat = now;
+    }
+
+    if (now - this.lastGlyphInject >= GLYPH_INTERVAL_MS) {
+      this.injectGlyph();
+      this.lastGlyphInject = now;
     }
 
     this.cursorSplat();
