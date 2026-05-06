@@ -665,18 +665,7 @@ class FluidSim {
       const py = cy + Math.sin(angle) * ringRadius;
       const dx = Math.cos(angle) * burstForce;
       const dy = Math.sin(angle) * burstForce;
-      const sp = this.programs.splat;
-      gl.useProgram(sp.prog);
-      gl.uniform1i(
-        sp.uniforms["u_target"]!,
-        this.velocity.read.attach(0),
-      );
-      gl.uniform1f(sp.uniforms["u_aspectRatio"]!, aspect);
-      gl.uniform2f(sp.uniforms["u_point"]!, px, py);
-      gl.uniform3f(sp.uniforms["u_color"]!, dx, dy, 0);
-      gl.uniform1f(sp.uniforms["u_radius"]!, (SPLAT_RADIUS / 100) * 0.4);
-      this.blit(this.velocity.write);
-      this.velocity.swap();
+      this.splatVelocity(px, py, dx, dy, 0.4);
     }
   }
 
@@ -751,6 +740,47 @@ class FluidSim {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
+  private splatVelocity(
+    x: number,
+    y: number,
+    dx: number,
+    dy: number,
+    radiusScale = 1,
+  ) {
+    const gl = this.gl;
+    const aspect = this.canvas.width / this.canvas.height;
+    const radius = (SPLAT_RADIUS / 100) * radiusScale;
+    const p = this.programs.splat;
+    gl.useProgram(p.prog);
+    gl.uniform1i(p.uniforms["u_target"]!, this.velocity.read.attach(0));
+    gl.uniform1f(p.uniforms["u_aspectRatio"]!, aspect);
+    gl.uniform2f(p.uniforms["u_point"]!, x, y);
+    gl.uniform3f(p.uniforms["u_color"]!, dx, dy, 0);
+    gl.uniform1f(p.uniforms["u_radius"]!, radius);
+    this.blit(this.velocity.write);
+    this.velocity.swap();
+  }
+
+  private splatDye(
+    x: number,
+    y: number,
+    color: [number, number, number],
+    radiusScale = 1,
+  ) {
+    const gl = this.gl;
+    const aspect = this.canvas.width / this.canvas.height;
+    const radius = (SPLAT_RADIUS / 100) * radiusScale;
+    const p = this.programs.splat;
+    gl.useProgram(p.prog);
+    gl.uniform1i(p.uniforms["u_target"]!, this.dye.read.attach(0));
+    gl.uniform1f(p.uniforms["u_aspectRatio"]!, aspect);
+    gl.uniform2f(p.uniforms["u_point"]!, x, y);
+    gl.uniform3f(p.uniforms["u_color"]!, color[0], color[1], color[2]);
+    gl.uniform1f(p.uniforms["u_radius"]!, radius);
+    this.blit(this.dye.write);
+    this.dye.swap();
+  }
+
   private splatInk(
     x: number,
     y: number,
@@ -758,34 +788,8 @@ class FluidSim {
     dy: number,
     color: [number, number, number],
   ) {
-    const gl = this.gl;
-    const aspect = this.canvas.width / this.canvas.height;
-    const radius = SPLAT_RADIUS / 100;
-
-    // Velocity splat
-    {
-      const p = this.programs.splat;
-      gl.useProgram(p.prog);
-      gl.uniform1i(p.uniforms["u_target"]!, this.velocity.read.attach(0));
-      gl.uniform1f(p.uniforms["u_aspectRatio"]!, aspect);
-      gl.uniform2f(p.uniforms["u_point"]!, x, y);
-      gl.uniform3f(p.uniforms["u_color"]!, dx, dy, 0);
-      gl.uniform1f(p.uniforms["u_radius"]!, radius);
-      this.blit(this.velocity.write);
-      this.velocity.swap();
-    }
-    // Dye splat
-    {
-      const p = this.programs.splat;
-      gl.useProgram(p.prog);
-      gl.uniform1i(p.uniforms["u_target"]!, this.dye.read.attach(0));
-      gl.uniform1f(p.uniforms["u_aspectRatio"]!, aspect);
-      gl.uniform2f(p.uniforms["u_point"]!, x, y);
-      gl.uniform3f(p.uniforms["u_color"]!, color[0], color[1], color[2]);
-      gl.uniform1f(p.uniforms["u_radius"]!, radius);
-      this.blit(this.dye.write);
-      this.dye.swap();
-    }
+    this.splatVelocity(x, y, dx, dy);
+    this.splatDye(x, y, color);
   }
 
   private autoSplat(x?: number, y?: number) {
@@ -814,7 +818,9 @@ class FluidSim {
       this.cursor.moved = false;
       return;
     }
-    this.splatInk(this.cursor.x, this.cursor.y, dx, dy, INK_COLOR);
+    // Velocity only — cursor disturbs the field (so glyphs distort) but
+    // does not add new dye, so there are no flame trails behind the pointer.
+    this.splatVelocity(this.cursor.x, this.cursor.y, dx, dy);
     this.cursor.moved = false;
   }
 

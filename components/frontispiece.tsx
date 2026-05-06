@@ -1,8 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { HeroFluid } from "@/components/hero-fluid";
 
 /**
@@ -10,10 +16,10 @@ import { HeroFluid } from "@/components/hero-fluid";
  * behind everything. The painted backdrop in a Caravaggio: figure carved
  * out of dark ink-stained void by a single light.
  *
- * Phase 2: bust composite. The bust photo sits off-axis right, masked
- * with a radial vignette so its edges fade into the ink rather than
- * reading as a hard rectangle. Subtle scroll-driven settle and parallax;
- * the bust drifts slightly slower than the name as you scroll out.
+ * Phase 3.5: cursor-driven 3D tilt on the bust. The bust container picks
+ * up a pointer-relative perspective rotation (~6° max) so it reads as a
+ * sculpted object viewed from slightly different angles — no longer a
+ * flat sticker. Springs smooth the response.
  */
 export function Frontispiece() {
   const ref = useRef<HTMLDivElement>(null);
@@ -26,6 +32,24 @@ export function Frontispiece() {
   const bustScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
   const bustOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.5]);
   const fluidOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.4]);
+
+  // Cursor-driven 3D tilt — 0.5,0.5 at viewport centre, 0,0 top-left
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const rawRotateY = useTransform(mx, [0, 1], [8, -8]);
+  const rawRotateX = useTransform(my, [0, 1], [-5, 5]);
+  const rotateY = useSpring(rawRotateY, { stiffness: 80, damping: 18 });
+  const rotateX = useSpring(rawRotateX, { stiffness: 80, damping: 18 });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onMove = (e: PointerEvent) => {
+      mx.set(e.clientX / window.innerWidth);
+      my.set(e.clientY / window.innerHeight);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [mx, my]);
 
   return (
     <section
@@ -46,8 +70,7 @@ export function Frontispiece() {
         </motion.div>
 
         {/* Layer 1 — soft canvas wash on the left third for legibility of
-            the name. Right two-thirds untouched, so the ink reads loud
-            there and the bust lands in clean ink. */}
+            the name. */}
         <div
           aria-hidden="true"
           className="absolute inset-0 z-[1] pointer-events-none"
@@ -57,9 +80,7 @@ export function Frontispiece() {
           }}
         />
 
-        {/* Layer 2 — content. Off-axis right composition: name takes the
-            left half, bust sits flush-right inside its column with the
-            radial vignette so its edges dissolve into the ink. */}
+        {/* Layer 2 — content */}
         <motion.div
           style={{ y: nameY }}
           className="relative z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-center gap-10 px-8 pb-16 pt-32 md:grid-cols-12 md:px-16"
@@ -118,12 +139,22 @@ export function Frontispiece() {
             </motion.div>
           </div>
 
-          {/* Right column — bust off-axis right, vignette-masked */}
+          {/* Right column — bust, off-axis right, with cursor-driven 3D tilt */}
           <motion.div
-            style={{ y: bustY, scale: bustScale, opacity: bustOpacity }}
+            style={{
+              y: bustY,
+              scale: bustScale,
+              opacity: bustOpacity,
+              rotateX,
+              rotateY,
+              transformPerspective: 1200,
+            }}
             className="hidden md:col-span-5 md:flex items-center justify-end self-stretch"
           >
-            <div className="relative w-full max-w-md aspect-[3/4]">
+            <div
+              className="relative w-full max-w-md aspect-[3/4]"
+              style={{ transformStyle: "preserve-3d" }}
+            >
               {/* Subtle warm glow behind bust — pulls it forward of the ink */}
               <div
                 aria-hidden="true"
@@ -131,6 +162,7 @@ export function Frontispiece() {
                 style={{
                   background:
                     "radial-gradient(ellipse 50% 44% at 50% 50%, rgba(201,163,114,0.12) 0%, rgba(139,107,63,0.04) 42%, transparent 72%)",
+                  transform: "translateZ(-40px)",
                 }}
               />
               {/* Bust — clip-path reveal from below on mount, radial mask
@@ -144,6 +176,7 @@ export function Frontispiece() {
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 className="relative h-full w-full"
+                style={{ transformStyle: "preserve-3d" }}
               >
                 <Image
                   src="/bust.png"
