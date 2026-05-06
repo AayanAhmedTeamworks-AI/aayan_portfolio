@@ -1,53 +1,111 @@
-import { MagneticButton } from "@/components/magnetic-button";
-import { ArrowCTA } from "@/components/arrow-cta";
+"use client";
+
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 /**
- * Lean contact block. Three quiet hyperlinks plus one magnetic primary CTA.
- * No billboard, no marquee — the closing crescendo right after handles the
- * cinematic beat. This is the address card on the back of the catalogue.
+ * Contact section, shader.se-lean. Big italic "Hello." headline arrives via
+ * scroll-linked clip-path; the body sentence follows; the email itself is
+ * the primary CTA — rendered at headline scale, hover lights it sepia.
+ * Quiet metadata column on the right (LinkedIn / CV / Teamworks / address).
+ *
+ * No magnetic buttons, no marquee. The address is the catalogue label.
  */
 export function ContactSection() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.85", "end 0.5"],
+  });
+  const helloClip = useTransform(
+    scrollYProgress,
+    [0, 0.35],
+    ["inset(0 100% 0 0)", "inset(0 0% 0 0)"],
+  );
+
   return (
     <section
+      ref={ref}
       id="contact"
-      className="relative w-full pt-24 pb-24"
+      className="relative w-full min-h-[100vh] flex items-center py-24"
       data-cursor="Read"
     >
-      <div className="mx-auto max-w-[60ch] px-8 md:px-0">
-        <p className="font-serif text-[clamp(2.2rem,5.6vw,4rem)] leading-[1.05] tracking-[-0.03em] text-ink">
-          Open to thesis collaboration, DACH-SME automation, and{" "}
-          <span className="italic text-sepia/95">thoughtful</span> internships.
-        </p>
+      <div className="mx-auto max-w-[90rem] w-full px-8 md:px-16 grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-16 items-end">
+        {/* Left — the statement */}
+        <div className="md:col-span-8">
+          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-sepia/85 mb-6">
+            iv · Epistola
+          </p>
 
-        <div className="mt-12 flex items-center gap-8 flex-wrap">
-          <MagneticButton pull={18}>
-            <ArrowCTA href="mailto:syedaayan2001@gmail.com" external>
-              Send an email
-            </ArrowCTA>
-          </MagneticButton>
-          <MagneticButton pull={10}>
+          <motion.h2
+            style={{ clipPath: helloClip }}
+            className="font-serif italic text-[clamp(5rem,16vw,14rem)] leading-[0.92] tracking-[-0.045em] text-ink"
+          >
+            Hello.
+          </motion.h2>
+
+          <p className="mt-12 max-w-[44ch] font-serif text-2xl md:text-[1.65rem] leading-[1.32] tracking-[-0.005em] text-ink/85">
+            Currently shipping things from Friedberg. Thesis and
+            internship both wrap in May 2026 &mdash;{" "}
+            <span className="italic text-sepia/95">
+              talk to me about what comes next.
+            </span>
+          </p>
+
+          <a
+            href="mailto:syedaayan2001@gmail.com"
+            data-cursor="Mail"
+            className="group mt-14 inline-flex items-baseline gap-2 font-serif text-[clamp(1.6rem,4.6vw,3rem)] leading-none tracking-[-0.018em] text-ink hover:text-sepia transition-colors duration-500"
+          >
+            <span className="italic">syedaayan2001</span>
+            <span className="text-mute group-hover:text-sepia transition-colors duration-500">
+              @gmail.com
+            </span>
+            <span className="ml-3 text-sepia/85 transition-transform duration-500 group-hover:translate-x-1">
+              ↗
+            </span>
+          </a>
+        </div>
+
+        {/* Right — quiet metadata column */}
+        <div className="md:col-span-4 md:text-right space-y-4 font-mono text-[11px] uppercase tracking-[0.24em]">
+          <p className="text-mute mb-6 not-italic">Elsewhere</p>
+          <p>
             <a
               href="https://www.linkedin.com/in/syedaayanahmed"
               target="_blank"
               rel="noreferrer"
-              className="font-mono text-[11px] uppercase tracking-[0.24em] text-ink/85 hover:text-sepia transition-colors duration-300 underline decoration-hairline underline-offset-8"
+              className="text-ink/85 hover:text-sepia transition-colors duration-300"
             >
               LinkedIn ↗
             </a>
-          </MagneticButton>
-          <MagneticButton pull={10}>
+          </p>
+          <p>
             <a
               href="/aayan-ahmed-cv.pdf"
-              className="font-mono text-[11px] uppercase tracking-[0.24em] text-ink/85 hover:text-sepia transition-colors duration-300 underline decoration-hairline underline-offset-8"
+              className="text-ink/85 hover:text-sepia transition-colors duration-300"
             >
               Curriculum Vitæ ↗
             </a>
-          </MagneticButton>
+          </p>
+          <p>
+            <a
+              href="https://tmwrks-ai.de"
+              target="_blank"
+              rel="noreferrer"
+              className="text-ink/85 hover:text-sepia transition-colors duration-300"
+            >
+              Teamworks AI ↗
+            </a>
+          </p>
+          <p className="pt-4 mt-8 border-t border-hairline text-mute">
+            Friedberg · Ingolstadt
+            <br />
+            MMXXVI
+            <br />
+            English · Deutsch (working)
+          </p>
         </div>
-
-        <p className="mt-12 font-mono text-[11px] uppercase tracking-[0.24em] text-mute">
-          Friedberg · Ingolstadt · MMXXVI · English · Deutsch (working)
-        </p>
       </div>
     </section>
   );
