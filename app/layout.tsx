@@ -23,7 +23,7 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "Codex Ahmed — Syed Aayan Ahmed",
   description:
-    "Engineer of durable AI systems. Friedberg · Ingolstadt · MMXXVI. Work on LLM orchestration, offline-first PWAs, and workflow automation for DACH SMEs.",
+    "Engineer of durable AI systems. Augsburg · Ingolstadt · MMXXVI. Work on LLM orchestration, offline-first PWAs, and workflow automation for DACH SMEs.",
   metadataBase: new URL("https://codex-ahmed.vercel.app"),
   openGraph: {
     title: "Codex Ahmed",

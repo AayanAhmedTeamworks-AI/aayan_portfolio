@@ -47,7 +47,7 @@ export function Frontispiece() {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="mb-8 font-mono text-[11px] uppercase tracking-[0.28em] text-mute"
           >
-            Codex · MMXXVI · Friedberg / Ingolstadt
+            Codex · MMXXVI · Augsburg / Ingolstadt
           </motion.p>
 
           <h1 className="font-serif text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.92] tracking-[-0.045em] text-ink">

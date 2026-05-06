@@ -65,7 +65,7 @@ export function VitaSection() {
           >
             Teamworks AI
           </a>
-          , a small AI-forward consultancy in Friedberg that&apos;s quietly
+          , a small AI-forward consultancy near Augsburg that&apos;s quietly
           trying to drag the German construction industry &mdash; a sector
           that has been doing things mostly the same way since the
           Wirtschaftswunder &mdash; into the actual present.

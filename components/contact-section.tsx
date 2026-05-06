@@ -45,11 +45,11 @@ export function ContactSection() {
           </motion.h2>
 
           <p className="mt-12 max-w-[44ch] font-serif text-2xl md:text-[1.65rem] leading-[1.32] tracking-[-0.005em] text-ink/85">
-            Currently shipping things from Friedberg. Thesis and
-            internship both wrap in May 2026 &mdash;{" "}
+            I&apos;m in Augsburg, mostly writing code.{" "}
             <span className="italic text-sepia/95">
-              talk to me about what comes next.
-            </span>
+              I read every email I get and answer most of them.
+            </span>{" "}
+            Say something.
           </p>
 
           <a
@@ -99,7 +99,7 @@ export function ContactSection() {
             </a>
           </p>
           <p className="pt-4 mt-8 border-t border-hairline text-mute">
-            Friedberg · Ingolstadt
+            Augsburg · Ingolstadt
             <br />
             MMXXVI
             <br />

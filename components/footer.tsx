@@ -15,7 +15,7 @@ export function Footer() {
               Codex <span className="italic text-sepia/90">Ahmed</span>
             </p>
             <p className="mt-4 text-sm leading-[1.7] text-ink/70 max-w-[42ch]">
-              Friedberg · Ingolstadt · MMXXVI. AI orchestration,
+              Augsburg · Ingolstadt · MMXXVI. AI orchestration,
               offline-first PWAs, and workflow automation for small and
               medium-sized firms in the DACH region.
             </p>

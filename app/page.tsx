@@ -36,7 +36,6 @@ export default function Home() {
       <SectionIntro
         numeral="iv"
         title="How to reach me"
-        tagline="Open to thesis collaboration, DACH-SME automation, and thoughtful internships."
       />
       <ContactSection />
 
