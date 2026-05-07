@@ -414,15 +414,25 @@ void main() {
     return;
   }
   vec4 bust = texture(u_bust, bUV);
-  // Use the bust photo's natural alpha — no extra elliptical vignette,
-  // so the bust shows in its real silhouette (head + hair + toga).
-  float bustAlpha = bust.a;
+  // The bust photo has an opaque dark background — without dropping it
+  // we see a hard dark rectangle around the marble (the user's "looks
+  // like a 2D image" complaint). Extract alpha from luminance so the
+  // dark background becomes effectively transparent and the bust reads
+  // as carved out of the canvas, not pasted on top.
+  float lum = max(max(bust.r, bust.g), bust.b);
+  float silhouette = smoothstep(0.04, 0.18, lum);
+  float bustAlpha = bust.a * silhouette;
+  // Subtle warm halo behind the bust silhouette — anchors the figure
+  // in the canvas instead of having it float as a flat cutout.
+  vec3 halo = vec3(0.07, 0.05, 0.03) * silhouette;
+  vec3 bg = fluid + halo;
+
   float thr = dissolveThreshold(bUV, u_bias, u_biasAmt, u_noiseScale, u_warp);
   float visible = 1.0 - smoothstep(u_progress - u_rolloff,
                                    u_progress + u_rolloff, thr);
   float gaussian = exp(-pow((thr - u_progress) / u_rolloff, 2.0) * 3.0);
   vec3 rim = u_rimColor * gaussian * u_rimIntensity * bustAlpha;
-  vec3 col = mix(fluid, bust.rgb, visible * bustAlpha) + rim;
+  vec3 col = mix(bg, bust.rgb, visible * bustAlpha) + rim;
   fragColor = vec4(col, 1.0);
 }`;
 
