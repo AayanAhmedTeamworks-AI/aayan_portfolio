@@ -14,10 +14,11 @@ export default function Home() {
     <>
       <Frontispiece />
 
-      {/* Camera dolly into the bust's right eye, in WebGL2. Bust
-          renders inside the fluid context as a depth-displaced quad
-          sharing one cameraZ uniform with the fluid. Ends pixel-aligned
-          with the iris reveal's opening frame. */}
+      {/* Bust dissolves into ink. WebGL2: per-pixel FBM dissolve front
+          sweeps top-to-bottom across the bust photo; pixels at the front
+          inject golden-sepia ink + downward drip velocity into the same
+          fluid sim, get advected by the same frame's currents. Hand-off
+          to MuseumTransition is a black fade. */}
       <BridgeSection />
 
       {/* Iris opens onto the Berlin photo. Continues from the bridge's
