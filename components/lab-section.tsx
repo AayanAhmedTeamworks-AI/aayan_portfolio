@@ -1,4 +1,5 @@
 import { TokenizerComparator } from "@/components/tokenizer-comparator";
+import { DataOwnershipDemo } from "@/components/data-ownership-demo";
 
 /**
  * The Lab — a distinct visual register at the foot of the page, before the
@@ -34,6 +35,8 @@ export function LabSection() {
           </p>
           <TokenizerComparator />
         </article>
+
+        <DataOwnershipDemo />
       </div>
     </section>
   );
