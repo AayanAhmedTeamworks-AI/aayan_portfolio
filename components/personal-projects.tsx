@@ -47,8 +47,9 @@ export function PersonalProjects() {
           </h3>
           <ScrollProse>
             I fundraised for Amnesty International on the street, in
-            college. I learned that asking strangers for money is a very
-            specific kind of skill. I also met some of the most patient,
+            college. It is, mostly, the art of holding a stranger&apos;s
+            attention long enough to make them care &mdash; a very
+            specific kind of skill. I met some of the most patient,
             articulate, stubborn human beings I have ever talked to, and
             some of the rudest. Both groups were necessary.
           </ScrollProse>

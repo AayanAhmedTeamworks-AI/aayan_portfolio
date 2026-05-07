@@ -12,12 +12,12 @@ import { useEffect, useRef } from "react";
  * edges. prefers-reduced-motion returns null. RAF loop.
  */
 
-const PARTICLE_COUNT = 60;
-const CURSOR_RADIUS = 90;
+const PARTICLE_COUNT = 24;
+const CURSOR_RADIUS = 80;
 const FADE_RATE = 0.06;
 const FADE_IN_RATE = 0.005;
-const DRIFT_BASE = 0.12;
-const DRIFT_VAR = 0.06;
+const DRIFT_BASE = 0.10;
+const DRIFT_VAR = 0.05;
 
 type Particle = {
   x: number;
@@ -70,8 +70,8 @@ export function DustLayer() {
       p.vx = Math.cos(angle) * speed;
       p.vy = Math.sin(angle) * speed;
       p.opacity = 0;
-      p.birthOpacity = 0.18 + Math.random() * 0.22;
-      p.size = 1.2 + Math.random() * 1.8;
+      p.birthOpacity = 0.12 + Math.random() * 0.14;
+      p.size = 1.0 + Math.random() * 1.4;
       p.state = "fadingIn";
     };
 

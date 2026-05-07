@@ -26,12 +26,6 @@ export function VitaSection() {
         </ScrollProse>
 
         <ScrollProse>
-          I&apos;m the youngest son. My family put me on a plane and
-          trusted I&apos;d make it work &mdash;{" "}
-          <Emphasis>that&apos;s not a footnote.</Emphasis>
-        </ScrollProse>
-
-        <ScrollProse>
           I write code for a living. Python, TypeScript, SQL, an automation
           tool called n8n, the occasional bit of C++ when I&apos;m bored.
           I taught myself most of it and I&apos;m still not sure I do any
@@ -45,7 +39,7 @@ export function VitaSection() {
           >
             Teamworks AI
           </a>
-          , a small AI-forward consultancy near Augsburg that&apos;s quietly
+          , an AI-forward consultancy near Augsburg that&apos;s quietly
           trying to drag the German construction industry &mdash; a sector
           that has been doing things mostly the same way since the
           Wirtschaftswunder &mdash; into the actual present.
