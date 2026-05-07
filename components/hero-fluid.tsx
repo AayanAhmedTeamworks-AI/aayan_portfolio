@@ -395,9 +395,6 @@ uniform float u_progress;
 uniform float u_rolloff;
 uniform vec2 u_heroOffset;
 uniform vec2 u_heroSize;
-uniform vec2 u_vignetteCenter;
-uniform vec2 u_vignetteRadius;
-uniform float u_vignetteSoft;
 uniform vec2 u_bustTilt;
 uniform int u_bias;
 uniform float u_biasAmt;
@@ -409,9 +406,6 @@ void main() {
   vec3 dye = texture(u_dye, v_uv).rgb;
   vec3 fluid = u_canvasColor + dye;
 
-  // Apply cursor tilt as a tiny UV offset on the bust — fades out as
-  // the dissolve progresses (cursor influence becomes meaningless once
-  // the figure is melting).
   vec2 bUV = (v_uv - u_heroOffset) / u_heroSize
            + u_bustTilt * (1.0 - u_progress);
   bool inside = bUV.x >= 0.0 && bUV.x <= 1.0 && bUV.y >= 0.0 && bUV.y <= 1.0;
@@ -420,10 +414,9 @@ void main() {
     return;
   }
   vec4 bust = texture(u_bust, bUV);
-  vec2 d = (bUV - u_vignetteCenter) / u_vignetteRadius;
-  float r = dot(d, d);
-  float vignette = 1.0 - smoothstep(1.0 - u_vignetteSoft, 1.0, r);
-  float bustAlpha = bust.a * vignette;
+  // Use the bust photo's natural alpha — no extra elliptical vignette,
+  // so the bust shows in its real silhouette (head + hair + toga).
+  float bustAlpha = bust.a;
   float thr = dissolveThreshold(bUV, u_bias, u_biasAmt, u_noiseScale, u_warp);
   float visible = 1.0 - smoothstep(u_progress - u_rolloff,
                                    u_progress + u_rolloff, thr);
@@ -1243,9 +1236,6 @@ class HeroFluidSim {
       HERO_BUST_SIZE[0],
       HERO_BUST_SIZE[1],
     );
-    gl.uniform2f(p.uniforms["u_vignetteCenter"]!, 0.5, 0.52);
-    gl.uniform2f(p.uniforms["u_vignetteRadius"]!, 0.42, 0.55);
-    gl.uniform1f(p.uniforms["u_vignetteSoft"]!, 0.18);
     gl.uniform2f(p.uniforms["u_bustTilt"]!, this.bustTiltX, this.bustTiltY);
     gl.uniform1i(p.uniforms["u_bias"]!, BIAS);
     gl.uniform1f(p.uniforms["u_biasAmt"]!, BIAS_AMT);

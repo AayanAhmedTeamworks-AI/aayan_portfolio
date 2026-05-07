@@ -35,20 +35,22 @@ export function Frontispiece() {
     offset: ["start start", "end end"],
   });
 
+  // Dissolve starts immediately on first scroll — no hero-state hold.
+  // At scrollProgress 0, bust is fully present (dissolveProgress = 0).
+  // Each click of scroll directly progresses the dissolve.
   const dissolveProgress = useTransform(
     scrollYProgress,
-    [0.2, 0.88],
+    [0, 0.85],
     [0, 1],
     { clamp: true },
   );
 
-  const canvasOpacity = useTransform(scrollYProgress, [0.93, 1], [1, 0]);
-  const heroFade = useTransform(
-    scrollYProgress,
-    [0, 0.18, 0.4],
-    [1, 1, 0],
-  );
-  const nameY = useTransform(scrollYProgress, [0, 0.5], ["0%", "-12%"]);
+  const canvasOpacity = useTransform(scrollYProgress, [0.94, 1], [1, 0]);
+  // Hero text fades with the dissolve — visible until the bust is mostly
+  // gone, not before. Tied to dissolveProgress (not scrollProgress) so
+  // the name disappears at the same beat as the figure it names.
+  const heroFade = useTransform(dissolveProgress, [0.55, 0.85], [1, 0]);
+  const nameY = useTransform(dissolveProgress, [0, 1], ["0%", "-8%"]);
 
   // Cursor-driven UV tilt on the bust — pointer position offsets bust UV
   // by a tiny amount, faded out by the time the dissolve really kicks in.
@@ -58,7 +60,7 @@ export function Frontispiece() {
   const rawTiltY = useTransform(my, [0, 1], [0.008, -0.008]);
   const tiltX = useSpring(rawTiltX, { stiffness: 70, damping: 16 });
   const tiltY = useSpring(rawTiltY, { stiffness: 70, damping: 16 });
-  const tiltGate = useTransform(scrollYProgress, [0.18, 0.3], [1, 0]);
+  const tiltGate = useTransform(dissolveProgress, [0.05, 0.3], [1, 0]);
   const finalTiltX = useTransform(
     [tiltX, tiltGate],
     ([t, g]: number[]) => t * g,
