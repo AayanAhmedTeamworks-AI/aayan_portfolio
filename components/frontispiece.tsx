@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import {
   motion,
   useMotionValue,
-  useMotionValueEvent,
   useScroll,
   useSpring,
   useTransform,
@@ -13,25 +12,20 @@ import {
 import { HeroFluid } from "@/components/hero-fluid";
 
 /**
- * Frontispiece — combined hero + cinematic camera-zoom transition. Single
- * 440vh sticky section. The bust is one DOM element from start to finish,
- * but transform-origin is locked to the right eye so as the scale grows
- * the camera reads as dollying *into* the eye, not the bust simply
- * inflating from its centre.
+ * Frontispiece — combined hero + cinematic camera-zoom transition. The
+ * camera dollies *into* the right eye of the bust. To sell the dolly:
  *
- * Acts:
- *   I.  Hero (0 → 25%) — name + bust + ink fluid.
- *   II. Camera advances toward the eye (25 → 60%) — name + ink fade,
- *       bust scales 1×→7× anchored at the right eye, translate
- *       compensates so the eye drifts to viewport centre, vignette
- *       closes in, hair-flow SVG filter intensifies.
- *   III. Through the eye (60 → 86%) — bust dissolves; the elliptical
- *        curtain opens from viewport centre (the eye position) onto the
- *        Berlin photo behind.
- *   IV. Text emerges (86 → 100%).
+ *   - The bust's INNER container (the 440×587 photo) is what carries
+ *     the scale transform, with transform-origin locked at the eye.
+ *     The outer container only translates the bust between hero
+ *     position and centred-on-viewport.
+ *   - Background layers (fluid, wash) scale alongside the bust, slower,
+ *     so the entire scene feels like it's moving past the camera —
+ *     not just the bust inflating against a static black void.
+ *   - A vignette closes in as the dolly advances.
+ *   - The curtain ellipse opens from the eye position at peak growth.
  *
- * The right eye in the bust photo is approximately at (45%, 33%) — that
- * pair is the transformOrigin and the curtain origin both.
+ * No hair-flow filter. The dolly + scale + parallax do the heavy lifting.
  */
 export function Frontispiece() {
   const ref = useRef<HTMLDivElement>(null);
@@ -40,23 +34,20 @@ export function Frontispiece() {
     offset: ["start start", "end end"],
   });
 
-  // Hero content
+  // Hero content fade
   const heroFade = useTransform(scrollYProgress, [0, 0.22, 0.36], [1, 1, 0]);
   const nameY = useTransform(scrollYProgress, [0, 0.4], ["0%", "-18%"]);
 
-  // Bust trajectory — scale + translate so the right eye lands at viewport centre.
-  // At hero state the bust container is flex-centred and translated 26vw right
-  // (right column visual). The eye sits at (45%, 33%) of the 440×587 bust
-  // → about (-22px, -99px) from bust centre → (~+25vw, -9vh) from viewport
-  // centre. To put the eye at viewport centre at peak growth, we translate
-  // x ≈ +1vw and y ≈ +9vh.
-  const bustScale = useTransform(scrollYProgress, [0, 0.25, 0.62], [1, 1, 7]);
-  const bustX = useTransform(
+  // Bust trajectory.
+  // Outer translates: hero "26vw, 0" → "1vw, 9vh" so the eye lands at
+  // viewport centre.
+  // Inner scales: 1 → 7 with transform-origin at (45%, 33%) — the eye.
+  const bustOuterX = useTransform(
     scrollYProgress,
     [0, 0.25, 0.6],
     ["26vw", "26vw", "1vw"],
   );
-  const bustY = useTransform(
+  const bustOuterY = useTransform(
     scrollYProgress,
     [0, 0.25, 0.6],
     ["0vh", "0vh", "9vh"],
@@ -66,47 +57,47 @@ export function Frontispiece() {
     [0, 0.56, 0.66],
     [1, 1, 0],
   );
-  // Subtle wobble during growth phase
+  const bustScale = useTransform(scrollYProgress, [0, 0.25, 0.62], [1, 1, 7]);
   const bustRotate = useTransform(
     scrollYProgress,
     [0.25, 0.32, 0.4, 0.48, 0.56, 0.62],
-    [0, 1.4, -1.2, 0.9, -0.6, 0],
+    [0, 1.0, -0.9, 0.7, -0.5, 0],
   );
 
-  // Hair-flow displacement intensity. 0 at hero, ramps to ~28 during
-  // growth, drops back to 0 as bust fades.
-  const hairDisplaceScale = useTransform(
+  // Background dolly — fluid + wash scale up alongside the bust, slower
+  // (1 → 2.4 vs bust's 1 → 7), with origin at the eye's *peak* position
+  // (viewport centre). They look like the camera is pushing through them.
+  const bgScale = useTransform(
     scrollYProgress,
-    [0.18, 0.4, 0.6, 0.66],
-    [0, 12, 32, 0],
+    [0, 0.25, 0.6],
+    [1, 1, 2.4],
+  );
+  // Origin shifts from (75%, 41%) at hero (where the eye starts) toward
+  // (50%, 50%) at peak (where the eye ends), so the dolly origin tracks
+  // the eye even as it crosses the screen.
+  const bgOriginX = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.6],
+    ["75%", "75%", "50%"],
+  );
+  const bgOriginY = useTransform(
+    scrollYProgress,
+    [0, 0.25, 0.6],
+    ["41%", "41%", "50%"],
+  );
+  const bgOrigin = useTransform(
+    [bgOriginX, bgOriginY],
+    ([x, y]: string[]) => `${x} ${y}`,
   );
 
-  const displaceMapRef = useRef<SVGFEDisplacementMapElement>(null);
-  useMotionValueEvent(hairDisplaceScale, "change", (s) => {
-    if (displaceMapRef.current) {
-      displaceMapRef.current.setAttribute("scale", String(s));
-    }
-  });
-
-  // Camera-zoom vignette — corners darken as we advance
+  // Vignette closes in as we advance, fades as curtain takes over
   const vignetteOpacity = useTransform(
     scrollYProgress,
     [0.2, 0.55, 0.66],
-    [0, 0.7, 0],
+    [0, 0.55, 0],
   );
 
-  // Subtle motion blur on bust during fast scale changes
-  const bustBlur = useTransform(
-    scrollYProgress,
-    [0.25, 0.45, 0.62],
-    ["0px", "1.5px", "3px"],
-  );
-  const bustFilter = useTransform(
-    bustBlur,
-    (b) => `url(#hair-flow) blur(${b})`,
-  );
-
-  // Curtain — opens from the eye, which by 60% has reached viewport centre.
+  // Curtain — opens from where the eye lands (viewport centre)
   const curtainClip = useTransform(
     scrollYProgress,
     [0.6, 0.86],
@@ -126,20 +117,20 @@ export function Frontispiece() {
   const textOpacity = useTransform(scrollYProgress, [0.86, 0.96], [0, 1]);
   const textY = useTransform(scrollYProgress, [0.86, 1], [50, 0]);
 
-  // Cursor-driven 3D tilt — hero state only
+  // Cursor 3D tilt on bust — hero state only
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
   const rawRotateY = useTransform(mx, [0, 1], [8, -8]);
   const rawRotateX = useTransform(my, [0, 1], [-5, 5]);
-  const rotateY = useSpring(rawRotateY, { stiffness: 80, damping: 18 });
-  const rotateX = useSpring(rawRotateX, { stiffness: 80, damping: 18 });
+  const rotateYRaw = useSpring(rawRotateY, { stiffness: 80, damping: 18 });
+  const rotateXRaw = useSpring(rawRotateX, { stiffness: 80, damping: 18 });
   const tiltScale = useTransform(scrollYProgress, [0.18, 0.28], [1, 0]);
   const innerRotateX = useTransform(
-    [rotateX, tiltScale],
+    [rotateXRaw, tiltScale],
     ([r, t]: number[]) => r * t,
   );
   const innerRotateY = useTransform(
-    [rotateY, tiltScale],
+    [rotateYRaw, tiltScale],
     ([r, t]: number[]) => r * t,
   );
 
@@ -160,50 +151,6 @@ export function Frontispiece() {
       style={{ height: "440vh" }}
       data-cursor="Look"
     >
-      {/* SVG filter for the hair-flow displacement — turbulence with
-          continuously animating seed, displacement scale driven by scroll
-          via JS attribute updates above. */}
-      <svg
-        width="0"
-        height="0"
-        aria-hidden="true"
-        style={{ position: "absolute" }}
-      >
-        <defs>
-          <filter
-            id="hair-flow"
-            x="-15%"
-            y="-15%"
-            width="130%"
-            height="130%"
-          >
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.008 0.028"
-              numOctaves="2"
-              seed="2"
-              result="noise"
-            >
-              <animate
-                attributeName="seed"
-                from="2"
-                to="240"
-                dur="14s"
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            <feDisplacementMap
-              ref={displaceMapRef}
-              in="SourceGraphic"
-              in2="noise"
-              scale="0"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-        </defs>
-      </svg>
-
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-canvas">
         {/* Layer -1 — Berlin photo, behind everything, revealed by curtain */}
         <motion.div
@@ -235,18 +182,26 @@ export function Frontispiece() {
           </motion.div>
         </motion.div>
 
-        {/* Layer 0 — fluid backdrop (hero state) */}
+        {/* Layer 0 — fluid backdrop, dollies forward (scales) with camera */}
         <motion.div
-          style={{ opacity: heroFade }}
+          style={{
+            opacity: heroFade,
+            scale: bgScale,
+            transformOrigin: bgOrigin,
+          }}
           className="absolute inset-0 z-[5]"
         >
           <HeroFluid />
         </motion.div>
 
-        {/* Layer 1 — left wash for name legibility */}
+        {/* Layer 1 — left wash, dollies forward too */}
         <motion.div
           aria-hidden="true"
-          style={{ opacity: heroFade }}
+          style={{
+            opacity: heroFade,
+            scale: bgScale,
+            transformOrigin: bgOrigin,
+          }}
           className="absolute inset-0 z-[6] pointer-events-none"
         >
           <div
@@ -318,25 +273,28 @@ export function Frontispiece() {
           </div>
         </motion.div>
 
-        {/* Layer 3 — THE BUST. transform-origin at right eye (45%, 33%). */}
+        {/* Layer 3 — THE BUST.
+            Outer wrapper translates the bust from hero position to
+            centred-on-viewport.
+            Inner wrapper carries the scale + rotate, with
+            transform-origin at the eye (45%, 33%) — so scaling expands
+            outward FROM the eye. This is the dolly-into-the-eye. */}
         <motion.div
           style={{
-            x: bustX,
-            y: bustY,
-            scale: bustScale,
+            x: bustOuterX,
+            y: bustOuterY,
             opacity: bustOpacity,
-            rotateZ: bustRotate,
-            transformOrigin: "45% 33%",
           }}
           className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none"
         >
           <motion.div
             style={{
+              scale: bustScale,
+              rotateZ: bustRotate,
               rotateX: innerRotateX,
               rotateY: innerRotateY,
-              transformPerspective: 1200,
               transformOrigin: "45% 33%",
-              filter: bustFilter,
+              transformPerspective: 1200,
             }}
             className="relative w-[440px] aspect-[3/4]"
           >
@@ -358,7 +316,7 @@ export function Frontispiece() {
           </motion.div>
         </motion.div>
 
-        {/* Layer 4 — camera-zoom vignette: corners darken as we advance */}
+        {/* Layer 4 — vignette closes in as camera advances */}
         <motion.div
           aria-hidden="true"
           style={{ opacity: vignetteOpacity }}
