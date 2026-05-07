@@ -37,11 +37,12 @@ export function Frontispiece() {
 
   // Dissolve starts immediately on first scroll — no hero-state hold.
   // At scrollProgress 0, bust is fully present (dissolveProgress = 0).
-  // Each click of scroll directly progresses the dissolve.
+  // Output peaks at 1.05 (slightly past 1) so threshold smoothstep
+  // fully dissolves even pixels with threshold = 1 at scroll end.
   const dissolveProgress = useTransform(
     scrollYProgress,
     [0, 0.85],
-    [0, 1],
+    [0, 1.05],
     { clamp: true },
   );
 

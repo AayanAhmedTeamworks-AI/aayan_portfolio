@@ -429,8 +429,11 @@ void main() {
   vec3 bg = fluid + halo;
 
   float thr = dissolveThreshold(bUV, u_bias, u_biasAmt, u_noiseScale, u_warp);
-  float visible = 1.0 - smoothstep(u_progress - u_rolloff,
-                                   u_progress + u_rolloff, thr);
+  // visible = "is this pixel still bust" = "is its threshold above the
+  // current progress." At progress=0 every threshold is above (bust
+  // fully shown); at progress=1 every threshold is below (bust gone).
+  float visible = smoothstep(u_progress - u_rolloff,
+                             u_progress + u_rolloff, thr);
   float gaussian = exp(-pow((thr - u_progress) / u_rolloff, 2.0) * 3.0);
   vec3 rim = u_rimColor * gaussian * u_rimIntensity * bustAlpha;
   vec3 col = mix(bg, bust.rgb, visible * bustAlpha) + rim;
