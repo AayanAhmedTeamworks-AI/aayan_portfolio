@@ -959,8 +959,25 @@ class HeroFluidSim {
       this.cursor.moved = false;
       return;
     }
-    // Velocity-only — disturbs the field without painting flame trails
     this.splatVelocity(this.cursor.x, this.cursor.y, dx, dy);
+
+    // If cursor is over the bust, also paint ink — the user can wound /
+    // destroy the bust with the cursor. Dye intensity scales with cursor
+    // speed so a flick draws a heavier streak than a hover.
+    const bx = (this.cursor.x - HERO_BUST_OFFSET[0]) / HERO_BUST_SIZE[0];
+    const by = (this.cursor.y - HERO_BUST_OFFSET[1]) / HERO_BUST_SIZE[1];
+    if (bx >= 0 && bx <= 1 && by >= 0 && by <= 1) {
+      const speed = Math.sqrt(
+        this.cursor.dx * this.cursor.dx + this.cursor.dy * this.cursor.dy,
+      );
+      const intensity = Math.min(1.5, speed * 4);
+      const color: [number, number, number] = [
+        DISSOLVE_INK[0] * intensity,
+        DISSOLVE_INK[1] * intensity,
+        DISSOLVE_INK[2] * intensity,
+      ];
+      this.splatDye(this.cursor.x, this.cursor.y, color, 0.45);
+    }
     this.cursor.moved = false;
   }
 

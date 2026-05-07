@@ -5,7 +5,6 @@ import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
-import { BustLoader } from "@/components/bust-loader";
 import { LenisRoot } from "@/components/lenis-root";
 import { Cursor } from "@/components/cursor";
 import { CursorPrelude } from "@/components/cursor-prelude";
@@ -44,7 +43,6 @@ export default function RootLayout({
     >
       <body className="min-h-dvh bg-canvas text-ink font-sans antialiased grain-overlay">
         <LenisRoot>
-          <BustLoader />
           <Cursor />
           <CursorPrelude />
           <DustLayer />
