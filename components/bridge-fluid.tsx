@@ -264,11 +264,13 @@ void main() {
   vec3 bg = CANVAS + dye;
 
   // ---- Bust framing ----
-  // At cameraZ=0: bust occupies HERO_BUST_OFFSET..+HERO_BUST_SIZE region.
-  // At cameraZ=1: bust is heavily zoomed; eyeUV maps to viewport (0.5, 0.5)
-  //   and the eye fills the centre. We compute an interpolated frame.
-  // Climax bust size (in viewport units) — small means heavy zoom.
-  float climaxSizeY = 0.06;
+  // Mapping: bUV = (vp - offset) / size
+  //   small size  → bust occupies a small viewport region (zoomed OUT)
+  //   large size  → bust extends far past viewport (zoomed IN)
+  // At cameraZ=0: bust occupies HERO_BUST_OFFSET..+HERO_BUST_SIZE.
+  // At cameraZ=1: size is large so the bust is tightly framed around the
+  // eye; offset shifts to keep eyeUV at viewport (0.5, 0.5).
+  float climaxSizeY = 14.0;
   float climaxSizeX = climaxSizeY * (u_heroSize.x / u_heroSize.y);
   vec2 climaxSize = vec2(climaxSizeX, climaxSizeY);
   vec2 climaxOffset = vec2(0.5) - u_eyeUV * climaxSize;

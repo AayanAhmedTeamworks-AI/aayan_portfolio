@@ -12,37 +12,44 @@ import { BridgeFluid } from "@/components/bridge-fluid";
  * parallax displacement + hair turbulence, fluid background sharing the
  * same camera. Pure WebGL2; no DOM transforms on the bust.
  *
- * At cameraZ = 0 the bust framing matches the hero's right-column
- * placement (the hero's CSS bust has just faded). At cameraZ = 1 the
- * pupil sits at viewport centre, ready for the iris reveal opening
- * frame in <MuseumTransition/>.
+ * Two scroll observers:
+ *   - main (start start → end end): drives cameraZ across the pin
+ *   - fadeIn (start end → start start): drives bridgeOpacity so the
+ *     canvas only becomes visible once it's near pin position. Without
+ *     this, the bridge bust would render simultaneously with the hero
+ *     bust during the scroll-in phase.
  */
 export function BridgeSection() {
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
+
+  // Drives cameraZ across the pin
+  const { scrollYProgress: pinProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
-  // Smooth the progress slightly so cameraZ eases at both ends
-  const cameraZ = useTransform(scrollYProgress, [0, 1], [0, 1], {
+  const cameraZ = useTransform(pinProgress, [0, 1], [0, 1], {
     clamp: true,
   });
 
-  // Vignette that closes in as the dolly progresses, then opens as we
-  // approach the iris hand-off
+  // Drives the canvas fade-in as the bridge approaches pin
+  const { scrollYProgress: enterProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "start start"],
+  });
+  // 0 when bridge top at viewport bottom, 1 when bridge top at viewport top.
+  // Fade in steeply at the very end (only visible once near pin).
+  const bridgeOpacity = useTransform(enterProgress, [0.85, 1], [0, 1]);
+
+  // Vignette closes in as the dolly progresses, opens as we approach hand-off
   const vignetteOpacity = useTransform(
-    scrollYProgress,
+    pinProgress,
     [0.15, 0.7, 0.95],
     [0, 0.55, 0.15],
   );
 
-  // Fade out at the very end so the hand-off to MuseumTransition's iris
-  // begins on a clean canvas (the iris opens from black).
-  const handoffFade = useTransform(
-    scrollYProgress,
-    [0.92, 1],
-    [1, 0],
-  );
+  // Hand-off fade: bridge fades to black at the very end so MuseumTransition
+  // iris opens from clean black.
+  const handoffFade = useTransform(pinProgress, [0.92, 1], [1, 0]);
 
   return (
     <section
@@ -53,10 +60,15 @@ export function BridgeSection() {
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-canvas">
         <motion.div
-          style={{ opacity: handoffFade }}
+          style={{ opacity: bridgeOpacity }}
           className="absolute inset-0 z-0"
         >
-          <BridgeFluid cameraZ={cameraZ} />
+          <motion.div
+            style={{ opacity: handoffFade }}
+            className="absolute inset-0"
+          >
+            <BridgeFluid cameraZ={cameraZ} />
+          </motion.div>
         </motion.div>
 
         <motion.div

@@ -30,8 +30,14 @@ export function Frontispiece() {
   const nameY = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
   const bustY = useTransform(scrollYProgress, [0, 1], ["0%", "-9%"]);
   const bustScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
-  const bustOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0]);
-  const fluidOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0]);
+  // Hero bust fades earlier (by progress 0.65, well before bridge appears)
+  // so there's no overlap with the bridge's bust during scroll-in.
+  const bustOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.45, 0.65],
+    [1, 1, 0],
+  );
+  const fluidOpacity = useTransform(scrollYProgress, [0, 0.5, 0.7], [1, 1, 0]);
 
   // Cursor-driven 3D tilt on the bust
   const mx = useMotionValue(0.5);
