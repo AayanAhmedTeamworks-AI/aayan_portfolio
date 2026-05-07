@@ -5,7 +5,6 @@ import { VitaSection } from "@/components/vita-section";
 import { WorkBillboard } from "@/components/work-billboard";
 import { PersonalProjects } from "@/components/personal-projects";
 import { ContactSection } from "@/components/contact-section";
-import { ClosingPortrait } from "@/components/closing-portrait";
 import { LabSection } from "@/components/lab-section";
 
 export default function Home() {
@@ -37,13 +36,6 @@ export default function Home() {
         title="How to reach me"
       />
       <ContactSection />
-
-      <ClosingPortrait
-        src="/bust.png"
-        alt="Sculpted marble portrait of Syed Aayan Ahmed"
-        caption="MMXXVI"
-        figureLabel="fig. iii"
-      />
 
       <SectionIntro
         numeral="v"

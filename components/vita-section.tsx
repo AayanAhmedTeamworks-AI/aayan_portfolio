@@ -4,13 +4,10 @@ import { Emphasis } from "@/components/emphasis";
 
 /**
  * Vita section — first-person self-portrait. Each paragraph is a
- * <ScrollProse/> block: words brighten one at a time against the fixed
- * canvas as the reader scrolls through. Three pull-quote underlines mark
- * the load-bearing sentences. Photos as plates between paragraph blocks.
- *
- * The Berlin photo + opening sentence ("My name is Syed Aayan Ahmed.")
- * have moved into <MuseumTransition/> — Vita prose now picks up from
- * the second sentence onward.
+ * <ScrollProse/> block with word-by-word brightening; emphasis lines
+ * carry a warm-gold underline. One photo plate (the late-Gerbergasse
+ * mug shot) sits between the language paragraph and the "Boring is a
+ * feature" paragraph.
  */
 export function VitaSection() {
   return (
@@ -19,7 +16,6 @@ export function VitaSection() {
       className="relative w-full pt-12 pb-16"
       data-cursor="Read"
     >
-      {/* Prose column — word-by-word scroll-linked brightening */}
       <div className="mx-auto max-w-[60ch] px-8 md:px-0 font-serif text-[19px] md:text-[21px] leading-[1.65] text-ink space-y-9">
         <ScrollProse>
           I was born in India and moved to Germany at twenty-one for an
@@ -54,21 +50,7 @@ export function VitaSection() {
           that has been doing things mostly the same way since the
           Wirtschaftswunder &mdash; into the actual present.
         </ScrollProse>
-      </div>
 
-      <div className="mx-auto mt-20 max-w-md px-8 md:px-0">
-        <PortraitNiche
-          src="/portrait-valencia.jpg"
-          alt="Portrait of Syed Aayan Ahmed, València"
-          width={900}
-          height={1200}
-          caption="València · MMXXV"
-          figureLabel="fig. i"
-          variant="plate"
-        />
-      </div>
-
-      <div className="mx-auto mt-20 max-w-[60ch] px-8 md:px-0 font-serif text-[19px] md:text-[21px] leading-[1.65] text-ink space-y-9">
         <ScrollProse>
           Before this I was a data annotator at a company in Munich. Ten
           thousand labels on invoices and receipts. It is the loneliest,
@@ -93,40 +75,31 @@ export function VitaSection() {
           width={1932}
           height={2576}
           caption="Gerbergasse · late"
-          figureLabel="fig. ii"
+          figureLabel="fig. i"
           variant="plate"
         />
       </div>
 
       <div className="mx-auto mt-20 max-w-[60ch] px-8 md:px-0 font-serif text-[19px] md:text-[21px] leading-[1.65] text-ink space-y-9">
         <ScrollProse>
-          When I&apos;m not working I&apos;m walking &mdash; through the
-          Altstadt, along the Donau, or whichever city I happen to be in
-          that weekend. I call my mother in Hindi, fast and warm; I usually
-          don&apos;t tell her about the deploy. I let people who love me
-          cook for me most nights, or persuade them to. I read papers I
-          don&apos;t always understand. I listen to techno when I want to
-          focus and flamenco when I want to feel something, which makes
-          very little sense to anyone except me.
-        </ScrollProse>
-
-        <ScrollProse>
           I have one belief about the work and it&apos;s this: the best AI
           system is the one nobody talks about because it just works.{" "}
           <Emphasis>
             <em className="italic text-sepia/95">Boring is a feature.</em>
           </Emphasis>{" "}
-          It means it shipped. It means somebody, somewhere, used it
-          without noticing. The thing I&apos;m proudest of is work no one
-          will ever ask me about at a party.
+          It means it shipped, somebody&apos;s using it right now without
+          thinking about it, and it hasn&apos;t broken yet. There&apos;s a
+          particular, underrated kind of cool in that &mdash; and
+          it&apos;s the kind I&apos;m chasing.
         </ScrollProse>
 
         <ScrollProse>
           I&apos;m a kid with a German residence permit and a stubborn
           belief that integration is worth more than invention. I plan to
           stay. I plan to keep building things that don&apos;t make
-          headlines and that people use anyway &mdash; and, eventually, a
-          few that do.
+          headlines and that people use anyway. And, in time, with enough
+          stubbornness, something good enough that the headlines are an
+          accident.
         </ScrollProse>
       </div>
     </section>
