@@ -5,6 +5,7 @@ import { VitaSection } from "@/components/vita-section";
 import { WorkBillboard } from "@/components/work-billboard";
 import { PersonalProjects } from "@/components/personal-projects";
 import { ContactSection } from "@/components/contact-section";
+import { SpotlightIgnite } from "@/components/spotlight-ignite";
 import { LabSection } from "@/components/lab-section";
 
 export default function Home() {
@@ -37,11 +38,10 @@ export default function Home() {
       />
       <ContactSection />
 
-      <SectionIntro
-        numeral="v"
-        title="The lab"
-        tagline="Things you can play with. No API keys, no telemetry — the demos run in your browser."
-      />
+      {/* Spotlight ignites — the museum dims, the curator turns on the
+          lab lamp. Replaces the SectionIntro for Lab; same chapter
+          framing, carried by the gesture instead. */}
+      <SpotlightIgnite />
       <LabSection />
     </>
   );
