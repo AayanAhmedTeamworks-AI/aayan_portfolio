@@ -65,11 +65,12 @@ const NOISE_SCALE = 5.0;
 const WARP = 0.32;
 const BIAS = 0; // 0=top-down, 1=bottom-up, 2=radial-out, 3=radial-in
 const BIAS_AMT = 0.6;
-const INK_GAIN = 1.0;
-const DRIP_STRENGTH = 540;
-const DISPERSE_STRENGTH = 130;
-const VEL_JITTER = 0.25;
-const RIM_INTENSITY = 0.36;
+// Dialed down — dust-and-disperse, not roaring flames
+const INK_GAIN = 0.55;
+const DRIP_STRENGTH = 320;
+const DISPERSE_STRENGTH = 70;
+const VEL_JITTER = 0.18;
+const RIM_INTENSITY = 0.28;
 
 const VERTEX = `#version 300 es
 precision highp float;
