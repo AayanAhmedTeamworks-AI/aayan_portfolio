@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef } from "react";
 import {
   motion,
@@ -12,40 +11,62 @@ import {
 import { HeroFluid } from "@/components/hero-fluid";
 
 /**
- * Hero — bust on the right, name on the left, golden-ink fluid simulation
- * behind everything. The painted backdrop in a Caravaggio: figure carved
- * out of dark ink-stained void by a single light.
+ * Frontispiece — single 280vh sticky section that contains the hero AND
+ * the dissolve transition out of it. The bust never disappears and
+ * reappears: it lives inside the WebGL canvas from frame 0, the same
+ * DOM node carries it through the dissolve.
  *
- * 120vh sticky section. On scroll-out the bust + name fade and translate
- * gently. The cinematic curtain → Berlin → text reveal lives in the
- * separate <MuseumTransition/> after this; the bust does not try to scale
- * across both sections (a flat photo can't convincingly do a 3D dolly).
+ * Scroll choreography across the 180vh of pin scroll (scrollYProgress
+ * 0 → 1):
+ *   0.00 → 0.18  Hero state. dissolveProgress = 0. Bust full, name
+ *                + italic line + scroll cue visible. Cursor tilts
+ *                the bust via shader UV offset.
+ *   0.18 → 0.40  Hero text fades, cursor tilt fades.
+ *   0.20 → 0.88  dissolveProgress climbs 0 → 1. Per-pixel FBM front
+ *                sweeps top-to-bottom; pixels at the front bleed
+ *                ink into the dye + drip velocity into the field.
+ *   0.93 → 1.00  Canvas fades to black for the iris hand-off in
+ *                MuseumTransition.
  */
 export function Frontispiece() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start start", "end start"],
+    offset: ["start start", "end end"],
   });
-  const nameY = useTransform(scrollYProgress, [0, 1], ["0%", "-14%"]);
-  const bustY = useTransform(scrollYProgress, [0, 1], ["0%", "-9%"]);
-  const bustScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
-  // Hero bust fades earlier (by progress 0.65, well before bridge appears)
-  // so there's no overlap with the bridge's bust during scroll-in.
-  const bustOpacity = useTransform(
+
+  const dissolveProgress = useTransform(
     scrollYProgress,
-    [0, 0.45, 0.65],
+    [0.2, 0.88],
+    [0, 1],
+    { clamp: true },
+  );
+
+  const canvasOpacity = useTransform(scrollYProgress, [0.93, 1], [1, 0]);
+  const heroFade = useTransform(
+    scrollYProgress,
+    [0, 0.18, 0.4],
     [1, 1, 0],
   );
-  const fluidOpacity = useTransform(scrollYProgress, [0, 0.5, 0.7], [1, 1, 0]);
+  const nameY = useTransform(scrollYProgress, [0, 0.5], ["0%", "-12%"]);
 
-  // Cursor-driven 3D tilt on the bust
+  // Cursor-driven UV tilt on the bust — pointer position offsets bust UV
+  // by a tiny amount, faded out by the time the dissolve really kicks in.
   const mx = useMotionValue(0.5);
   const my = useMotionValue(0.5);
-  const rawRotateY = useTransform(mx, [0, 1], [8, -8]);
-  const rawRotateX = useTransform(my, [0, 1], [-5, 5]);
-  const rotateY = useSpring(rawRotateY, { stiffness: 80, damping: 18 });
-  const rotateX = useSpring(rawRotateX, { stiffness: 80, damping: 18 });
+  const rawTiltX = useTransform(mx, [0, 1], [-0.012, 0.012]);
+  const rawTiltY = useTransform(my, [0, 1], [0.008, -0.008]);
+  const tiltX = useSpring(rawTiltX, { stiffness: 70, damping: 16 });
+  const tiltY = useSpring(rawTiltY, { stiffness: 70, damping: 16 });
+  const tiltGate = useTransform(scrollYProgress, [0.18, 0.3], [1, 0]);
+  const finalTiltX = useTransform(
+    [tiltX, tiltGate],
+    ([t, g]: number[]) => t * g,
+  );
+  const finalTiltY = useTransform(
+    [tiltY, tiltGate],
+    ([t, g]: number[]) => t * g,
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -60,35 +81,44 @@ export function Frontispiece() {
   return (
     <section
       ref={ref}
-      className="relative w-full overflow-hidden"
-      style={{ height: "120vh" }}
+      className="relative w-full"
+      style={{ height: "280vh" }}
       data-cursor="Look"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Layer 0 — fluid backdrop */}
+      <div className="sticky top-0 h-screen w-full overflow-hidden bg-canvas">
+        {/* Layer 0 — fluid + bust + dissolve, all in one canvas */}
         <motion.div
-          style={{ opacity: fluidOpacity }}
+          style={{ opacity: canvasOpacity }}
           className="absolute inset-0 z-0"
         >
-          <HeroFluid />
+          <HeroFluid
+            dissolveProgress={dissolveProgress}
+            bustTiltX={finalTiltX}
+            bustTiltY={finalTiltY}
+          />
         </motion.div>
 
-        {/* Layer 1 — soft canvas wash on the left third for legibility */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 z-[1] pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(20,17,13,0.72) 0%, rgba(20,17,13,0.45) 28%, rgba(20,17,13,0) 55%)",
-          }}
-        />
-
-        {/* Layer 2 — content */}
+        {/* Layer 1 — left wash for name legibility */}
         <motion.div
-          style={{ y: nameY }}
-          className="relative z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-center gap-10 px-8 pb-16 pt-32 md:grid-cols-12 md:px-16"
+          aria-hidden="true"
+          style={{ opacity: heroFade }}
+          className="absolute inset-0 z-[1] pointer-events-none"
         >
-          <div className="md:col-span-7">
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(20,17,13,0.72) 0%, rgba(20,17,13,0.45) 28%, rgba(20,17,13,0) 55%)",
+            }}
+          />
+        </motion.div>
+
+        {/* Layer 2 — hero text */}
+        <motion.div
+          style={{ y: nameY, opacity: heroFade }}
+          className="absolute inset-0 z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-center gap-10 px-8 pb-16 pt-32 md:grid-cols-12 md:px-16 pointer-events-none"
+        >
+          <div className="md:col-span-7 pointer-events-auto">
             <motion.p
               initial={{ y: -24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -141,61 +171,7 @@ export function Frontispiece() {
               </motion.span>
             </motion.div>
           </div>
-
-          {/* Right column — bust off-axis right, with cursor-driven 3D tilt */}
-          <motion.div
-            style={{
-              y: bustY,
-              scale: bustScale,
-              opacity: bustOpacity,
-              rotateX,
-              rotateY,
-              transformPerspective: 1200,
-            }}
-            className="hidden md:col-span-5 md:flex items-center justify-end self-stretch"
-          >
-            <div
-              className="relative w-full max-w-md aspect-[3/4]"
-              style={{ transformStyle: "preserve-3d" }}
-            >
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-10"
-                style={{
-                  background:
-                    "radial-gradient(ellipse 50% 44% at 50% 50%, rgba(201,163,114,0.12) 0%, rgba(139,107,63,0.04) 42%, transparent 72%)",
-                  transform: "translateZ(-40px)",
-                }}
-              />
-              <motion.div
-                initial={{ clipPath: "inset(0 0 100% 0)" }}
-                animate={{ clipPath: "inset(0 0 0% 0)" }}
-                transition={{
-                  duration: 1.4,
-                  delay: 0.85,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="relative h-full w-full"
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                <Image
-                  src="/bust.png"
-                  alt="Sculpted marble portrait"
-                  fill
-                  priority
-                  quality={92}
-                  sizes="(max-width: 768px) 0px, 440px"
-                  className="object-contain"
-                  style={{
-                    WebkitMaskImage:
-                      "radial-gradient(ellipse 58% 68% at 50% 52%, #000 58%, transparent 95%)",
-                    maskImage:
-                      "radial-gradient(ellipse 58% 68% at 50% 52%, #000 58%, transparent 95%)",
-                  }}
-                />
-              </motion.div>
-            </div>
-          </motion.div>
+          {/* Right column intentionally empty — bust lives in the canvas */}
         </motion.div>
       </div>
     </section>

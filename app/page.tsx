@@ -1,4 +1,3 @@
-import { BridgeSection } from "@/components/bridge-section";
 import { Frontispiece } from "@/components/frontispiece";
 import { MuseumTransition } from "@/components/museum-transition";
 import { SectionIntro } from "@/components/section-intro";
@@ -14,15 +13,8 @@ export default function Home() {
     <>
       <Frontispiece />
 
-      {/* Bust dissolves into ink. WebGL2: per-pixel FBM dissolve front
-          sweeps top-to-bottom across the bust photo; pixels at the front
-          inject golden-sepia ink + downward drip velocity into the same
-          fluid sim, get advected by the same frame's currents. Hand-off
-          to MuseumTransition is a black fade. */}
-      <BridgeSection />
-
-      {/* Iris opens onto the Berlin photo. Continues from the bridge's
-          black hand-off. */}
+      {/* Iris opens onto the Berlin photo. Continues from Frontispiece's
+          black hand-off (after the bust has fully dissolved into ink). */}
       <MuseumTransition />
       <VitaSection />
 
