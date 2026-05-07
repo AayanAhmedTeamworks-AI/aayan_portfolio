@@ -1,3 +1,4 @@
+import { BridgeSection } from "@/components/bridge-section";
 import { Frontispiece } from "@/components/frontispiece";
 import { MuseumTransition } from "@/components/museum-transition";
 import { SectionIntro } from "@/components/section-intro";
@@ -13,9 +14,14 @@ export default function Home() {
     <>
       <Frontispiece />
 
-      {/* Curtain opens onto the Berlin photo, "My name is Syed Aayan
-          Ahmed." emerges. No bust scaling — the bust faded at the end
-          of the hero. */}
+      {/* Camera dolly into the bust's right eye, in WebGL2. Bust
+          renders inside the fluid context as a depth-displaced quad
+          sharing one cameraZ uniform with the fluid. Ends pixel-aligned
+          with the iris reveal's opening frame. */}
+      <BridgeSection />
+
+      {/* Iris opens onto the Berlin photo. Continues from the bridge's
+          black hand-off. */}
       <MuseumTransition />
       <VitaSection />
 

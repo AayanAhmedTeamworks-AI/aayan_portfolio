@@ -27,11 +27,14 @@ export function MuseumTransition() {
     offset: ["start start", "end end"],
   });
 
+  // Iris origin matches the bridge's climax pupil position (50%, 50%) so
+  // the hand-off is pixel-aligned: the bridge ends with the eye dead-
+  // centred, the iris opens from that same point.
   const curtainClip = useTransform(
     scrollYProgress,
     [0.1, 0.65],
     [
-      "ellipse(0% 0% at 50% 60%)",
+      "ellipse(0% 0% at 50% 50%)",
       "ellipse(120% 130% at 50% 50%)",
     ],
   );
