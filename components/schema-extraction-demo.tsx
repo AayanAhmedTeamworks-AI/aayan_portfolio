@@ -80,7 +80,7 @@ const FIELDS: Field[] = [
     trigger: 369,
     fillMs: 1500,
     value:
-      '[\n    { "kategorie": "delay",    "beschreibung": "Material 2h verspätet" },\n    { "kategorie": "delay",    "beschreibung": "Mischer: 30min verloren" },\n    { "kategorie": "accident", "beschreibung": "Yilmaz: Rücken" }\n  ]',
+      '[\n  { kategorie: "delay",\n    beschreibung: "Material 2h verspätet" },\n  { kategorie: "delay",\n    beschreibung: "Mischer: 30min verloren" },\n  { kategorie: "accident",\n    beschreibung: "Yilmaz: Rücken" }\n]',
   },
   {
     key: "todos",
@@ -88,7 +88,7 @@ const FIELDS: Field[] = [
     trigger: 447,
     fillMs: 1200,
     value:
-      '[\n    "Beton-Guss fertigstellen",\n    "nächste Materiallieferung planen",\n    "Safety-Follow-up Yilmaz"\n  ]',
+      '[\n  "Beton-Guss fertigstellen",\n  "nächste Materiallieferung planen",\n  "Safety-Follow-up Yilmaz"\n]',
   },
 ];
 
@@ -208,8 +208,9 @@ export function SchemaExtractionDemo() {
         A foreman calls in the day&apos;s site report. The transcript
         comes back messy, German, half-thought-through. A strict JSON
         schema is the only thing keeping the row honest &mdash; one field
-        fails validation on first attempt, retries, then lands. (This is
-        the actual pattern shipped to Baumann GmbH.)
+        fails validation on first attempt, retries, then lands. The same
+        pattern that runs in production for our German construction-industry
+        clients.
       </p>
 
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -356,8 +357,8 @@ function FieldRow({ field, state }: { field: Field; state: State }) {
               ) : null}
               <p
                 className={
-                  "font-mono text-[10.5px] text-ink/85 " +
-                  (isMulti ? "whitespace-pre" : "whitespace-pre-wrap")
+                  "font-mono text-ink/85 whitespace-pre-wrap break-words " +
+                  (isMulti ? "text-[10px] leading-[1.55]" : "text-[10.5px]")
                 }
               >
                 {state.shown}
