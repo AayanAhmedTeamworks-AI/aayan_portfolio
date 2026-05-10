@@ -1,6 +1,7 @@
 import { TokenizerComparator } from "@/components/tokenizer-comparator";
 import { DataOwnershipDemo } from "@/components/data-ownership-demo";
 import { SchemaExtractionDemo } from "@/components/schema-extraction-demo";
+import { EmbeddingMapDemo } from "@/components/embedding-map-demo";
 
 /**
  * The Lab — a distinct visual register at the foot of the page, before the
@@ -40,6 +41,8 @@ export function LabSection() {
         <DataOwnershipDemo />
 
         <SchemaExtractionDemo />
+
+        <EmbeddingMapDemo />
       </div>
     </section>
   );
