@@ -47,16 +47,48 @@ const AMBIENT_INK: [number, number, number] = [0.20, 0.16, 0.11];
 // pixels read as fresh ink against the existing field.
 const DISSOLVE_INK: [number, number, number] = [0.32, 0.26, 0.17];
 
-// Bust framed in viewport UV — measured from Frontispiece's CSS bust
-// at 1440-wide viewport (md:col-span-5, justify-end, max-w-md=448px,
-// aspect-[3/4], items-center, max-w-[90rem] grid). Bust goes from
-// UV (0.644, 0.169) to (0.956, 0.832).
-const HERO_BUST_OFFSET: [number, number] = [0.644, 0.169];
-const HERO_BUST_SIZE: [number, number] = [0.312, 0.663];
-const BUST_CENTRE: [number, number] = [
-  HERO_BUST_OFFSET[0] + HERO_BUST_SIZE[0] * 0.5,
-  HERO_BUST_OFFSET[1] + HERO_BUST_SIZE[1] * 0.55,
-];
+// Bust framed in viewport UV. Computed from canvas aspect at runtime — at
+// 1440-wide landscape, the bust hugs the right column (UV 0.644–0.956 x,
+// 0.169–0.832 y) so it sits beside the name. On a portrait phone canvas,
+// those same coords would squeeze it into a sliver against the right edge,
+// so we re-frame it large and centred in the upper half with the text
+// stack sitting beneath.
+// Landscape — bust sits beside the name in the right column.
+const BUST_UV_LANDSCAPE = {
+  offset: [0.644, 0.169] as [number, number],
+  size: [0.312, 0.663] as [number, number],
+};
+// Square-ish windows — bust centred, narrower than full portrait.
+const BUST_UV_SQUARE = {
+  offset: [0.30, 0.05] as [number, number],
+  size: [0.40, 0.58] as [number, number],
+};
+// Portrait phones — classical frontispiece layout. The bust is the
+// engraved figure in the MIDDLE band, with the tagline pinned above and
+// the name pinned below. UV y is measured from the bottom of the canvas
+// (UNPACK_FLIP_Y), so bust occupies y 0.40 → 0.88 = the middle 48% of
+// the screen. Width × height preserves the bust image's native 3:4
+// portrait ratio so it doesn't stretch.
+const BUST_UV_PORTRAIT = {
+  offset: [0.20, 0.40] as [number, number],
+  size: [0.60, 0.48] as [number, number],
+};
+
+function frameBust(aspect: number): {
+  offset: [number, number];
+  size: [number, number];
+  centre: [number, number];
+} {
+  let frame;
+  if (aspect < 0.85) frame = BUST_UV_PORTRAIT;
+  else if (aspect < 1.25) frame = BUST_UV_SQUARE;
+  else frame = BUST_UV_LANDSCAPE;
+  const centre: [number, number] = [
+    frame.offset[0] + frame.size[0] * 0.5,
+    frame.offset[1] + frame.size[1] * 0.55,
+  ];
+  return { ...frame, centre };
+}
 
 // Dissolve params
 const DISSOLVE_BAND = 0.06;
@@ -652,6 +684,12 @@ class HeroFluidSim {
   public bustTiltX = 0;
   public bustTiltY = 0;
   private cursor = { x: -1, y: -1, dx: 0, dy: 0, moved: false, inside: false };
+  private bustOffset: [number, number] = BUST_UV_LANDSCAPE.offset;
+  private bustSize: [number, number] = BUST_UV_LANDSCAPE.size;
+  private bustCentre: [number, number] = [
+    BUST_UV_LANDSCAPE.offset[0] + BUST_UV_LANDSCAPE.size[0] * 0.5,
+    BUST_UV_LANDSCAPE.offset[1] + BUST_UV_LANDSCAPE.size[1] * 0.55,
+  ];
   private paused = false;
   private resizeObserver: ResizeObserver | null = null;
   private intersectionObserver: IntersectionObserver | null = null;
@@ -883,6 +921,11 @@ class HeroFluidSim {
       c.width = w;
       c.height = h;
     }
+    const aspect = c.clientWidth / c.clientHeight || 1;
+    const framed = frameBust(aspect);
+    this.bustOffset = framed.offset;
+    this.bustSize = framed.size;
+    this.bustCentre = framed.centre;
   }
 
   private blit(target: FBO | null) {
@@ -971,8 +1014,8 @@ class HeroFluidSim {
     // If cursor is over the bust, also paint ink — the user can wound /
     // destroy the bust with the cursor. Dye intensity scales with cursor
     // speed so a flick draws a heavier streak than a hover.
-    const bx = (this.cursor.x - HERO_BUST_OFFSET[0]) / HERO_BUST_SIZE[0];
-    const by = (this.cursor.y - HERO_BUST_OFFSET[1]) / HERO_BUST_SIZE[1];
+    const bx = (this.cursor.x - this.bustOffset[0]) / this.bustSize[0];
+    const by = (this.cursor.y - this.bustOffset[1]) / this.bustSize[1];
     if (bx >= 0 && bx <= 1 && by >= 0 && by <= 1) {
       const speed = Math.sqrt(
         this.cursor.dx * this.cursor.dx + this.cursor.dy * this.cursor.dy,
@@ -1053,13 +1096,13 @@ class HeroFluidSim {
     );
     gl.uniform2f(
       p.uniforms["u_heroOffset"]!,
-      HERO_BUST_OFFSET[0],
-      HERO_BUST_OFFSET[1],
+      this.bustOffset[0],
+      this.bustOffset[1],
     );
     gl.uniform2f(
       p.uniforms["u_heroSize"]!,
-      HERO_BUST_SIZE[0],
-      HERO_BUST_SIZE[1],
+      this.bustSize[0],
+      this.bustSize[1],
     );
     gl.uniform1i(p.uniforms["u_bias"]!, BIAS);
     gl.uniform1f(p.uniforms["u_biasAmt"]!, BIAS_AMT);
@@ -1088,18 +1131,18 @@ class HeroFluidSim {
     gl.uniform1f(p.uniforms["u_jitter"]!, VEL_JITTER);
     gl.uniform2f(
       p.uniforms["u_heroOffset"]!,
-      HERO_BUST_OFFSET[0],
-      HERO_BUST_OFFSET[1],
+      this.bustOffset[0],
+      this.bustOffset[1],
     );
     gl.uniform2f(
       p.uniforms["u_heroSize"]!,
-      HERO_BUST_SIZE[0],
-      HERO_BUST_SIZE[1],
+      this.bustSize[0],
+      this.bustSize[1],
     );
     gl.uniform2f(
       p.uniforms["u_bustCentre"]!,
-      BUST_CENTRE[0],
-      BUST_CENTRE[1],
+      this.bustCentre[0],
+      this.bustCentre[1],
     );
     gl.uniform1i(p.uniforms["u_bias"]!, BIAS);
     gl.uniform1f(p.uniforms["u_biasAmt"]!, BIAS_AMT);
@@ -1242,13 +1285,13 @@ class HeroFluidSim {
     gl.uniform1f(p.uniforms["u_rolloff"]!, DISSOLVE_ROLLOFF);
     gl.uniform2f(
       p.uniforms["u_heroOffset"]!,
-      HERO_BUST_OFFSET[0],
-      HERO_BUST_OFFSET[1],
+      this.bustOffset[0],
+      this.bustOffset[1],
     );
     gl.uniform2f(
       p.uniforms["u_heroSize"]!,
-      HERO_BUST_SIZE[0],
-      HERO_BUST_SIZE[1],
+      this.bustSize[0],
+      this.bustSize[1],
     );
     gl.uniform2f(p.uniforms["u_bustTilt"]!, this.bustTiltX, this.bustTiltY);
     gl.uniform1i(p.uniforms["u_bias"]!, BIAS);

@@ -97,21 +97,6 @@
 }
 
 /* Fine film grain — adds tactile depth without distracting */
-/* Hide OS cursor in favour of the custom one — only on fine-pointer devices.
-   Inputs/textareas/contenteditable keep a text cursor for usability. */
-@media (hover: hover) and (pointer: fine) {
-  *,
-  *::before,
-  *::after {
-    cursor: none !important;
-  }
-  input,
-  textarea,
-  select,
-  [contenteditable="true"] {
-    cursor: text !important;
-  }
-}
 
 .grain-overlay::before {
   content: "";

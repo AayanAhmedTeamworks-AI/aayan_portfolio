@@ -16,9 +16,12 @@ export function Nav() {
         >
           <span className="italic">Codex</span> Ahmed
         </Link>
-        <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-mute hidden sm:inline">
-          MMXXVI
-        </span>
+        <Link
+          href="/#lab"
+          className="font-mono text-[10px] uppercase tracking-[0.25em] text-mute hover:text-sepia transition-colors duration-300 hidden sm:inline"
+        >
+          Lab
+        </Link>
       </nav>
     </header>
   );

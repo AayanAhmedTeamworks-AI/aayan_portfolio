@@ -14,20 +14,6 @@ export function PersonalProjects() {
       <article className="mx-auto max-w-[60ch] px-8 md:px-0 font-serif text-[18px] md:text-[20px] leading-[1.65] text-ink space-y-12">
         <div>
           <h3 className="font-serif text-xl tracking-[-0.01em] text-sepia/95 mb-3">
-            Travel Mitar
-          </h3>
-          <ScrollProse>
-            A Hindi voice form for Indian truck drivers who can&apos;t read
-            English forms. You speak, the form fills itself, the form
-            speaks back in Hindi to confirm. No screen. No reading. Just
-            talking. It hasn&apos;t shipped &mdash; I&apos;m building it
-            for an audience of about three of my uncles, and that is
-            enough motivation.
-          </ScrollProse>
-        </div>
-
-        <div>
-          <h3 className="font-serif text-xl tracking-[-0.01em] text-sepia/95 mb-3">
             LIME &amp; saliency on MNIST
           </h3>
           <ScrollProse>

@@ -28,7 +28,7 @@ export default function Home() {
       <SectionIntro
         numeral="iii"
         title="Made on my own"
-        tagline="Things I made for an audience of about three. I'm proud of them anyway."
+        tagline="Two things from outside the day job. One in code, one in conversation."
       />
       <PersonalProjects />
 

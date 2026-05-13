@@ -55,10 +55,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/experimenta/tokenizer"
+                  href="/#lab"
                   className="text-ink/85 hover:text-sepia transition-colors duration-300"
                 >
-                  Tokenizer comparator ↗
+                  The Lab ↓
                 </Link>
               </li>
             </ul>

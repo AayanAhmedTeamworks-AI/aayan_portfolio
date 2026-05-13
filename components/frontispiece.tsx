@@ -101,14 +101,26 @@ export function Frontispiece() {
           />
         </motion.div>
 
-        {/* Layer 1 — left wash for name legibility */}
+        {/* Layer 1 — wash for type legibility. md+: a left-to-right wash
+            darkens the name column on the left while the bust sits on the
+            right. Portrait phones use a frontispiece composition (tagline
+            top, bust middle, name bottom) so the wash is a sandwich —
+            dark at the top and bottom, clear through the middle where
+            the bust sits in the marble. */}
         <motion.div
           aria-hidden="true"
           style={{ opacity: heroFade }}
           className="absolute inset-0 z-[1] pointer-events-none"
         >
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 md:hidden"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(20,17,13,0.78) 0%, rgba(20,17,13,0.35) 12%, rgba(20,17,13,0) 28%, rgba(20,17,13,0) 60%, rgba(20,17,13,0.45) 78%, rgba(20,17,13,0.92) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0 hidden md:block"
             style={{
               background:
                 "linear-gradient(90deg, rgba(20,17,13,0.72) 0%, rgba(20,17,13,0.45) 28%, rgba(20,17,13,0) 55%)",
@@ -116,22 +128,41 @@ export function Frontispiece() {
           />
         </motion.div>
 
-        {/* Layer 2 — hero text */}
+        {/* Layer 2a — portrait-only tagline pinned at the top of the
+            frontispiece. On md+ this is hidden and the tagline appears
+            inside the main column with the rest of the type. */}
+        <motion.div
+          style={{ opacity: heroFade }}
+          className="absolute top-0 inset-x-0 z-10 px-6 pt-20 text-center pointer-events-none md:hidden"
+        >
+          <motion.p
+            initial={{ y: -24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="font-mono text-[10px] uppercase tracking-[0.28em] text-mute pointer-events-auto"
+          >
+            Codex · MMXXVI · Augsburg / Ingolstadt
+          </motion.p>
+        </motion.div>
+
+        {/* Layer 2b — name block. Bottom band on portrait, left column on
+            md+. The bust UV sits in the empty middle band on portrait
+            and in the right column on md+. */}
         <motion.div
           style={{ y: nameY, opacity: heroFade }}
-          className="absolute inset-0 z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-center gap-10 px-8 pb-16 pt-32 md:grid-cols-12 md:px-16 pointer-events-none"
+          className="absolute inset-0 z-10 mx-auto grid h-full max-w-[90rem] grid-cols-1 items-end gap-10 px-6 pb-12 md:grid-cols-12 md:items-center md:px-16 md:pb-16 md:pt-32 pointer-events-none"
         >
           <div className="md:col-span-7 pointer-events-auto">
             <motion.p
               initial={{ y: -24, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="mb-8 font-mono text-[11px] uppercase tracking-[0.28em] text-mute"
+              className="hidden md:block mb-8 font-mono text-[11px] uppercase tracking-[0.28em] text-mute"
             >
               Codex · MMXXVI · Augsburg / Ingolstadt
             </motion.p>
 
-            <h1 className="font-serif text-[clamp(3.5rem,10vw,9.5rem)] leading-[0.92] tracking-[-0.045em] text-ink">
+            <h1 className="font-serif text-[clamp(3rem,12vw,9.5rem)] leading-[0.92] tracking-[-0.045em] text-ink">
               <MaskedReveal delay={0.25}>Syed Aayan</MaskedReveal>
               <br />
               <MaskedReveal delay={0.55} className="italic text-sepia/95">
@@ -147,7 +178,7 @@ export function Frontispiece() {
                 delay: 1.4,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="mt-10 max-w-[28ch] font-serif italic text-2xl md:text-[1.75rem] leading-[1.18] tracking-[-0.01em] text-ink/82"
+              className="mt-6 md:mt-10 max-w-[28ch] font-serif italic text-xl md:text-[1.75rem] leading-[1.22] md:leading-[1.18] tracking-[-0.01em] text-ink/82"
             >
               Engineer of durable AI systems &mdash; making LLMs boring,
               on purpose.
@@ -157,7 +188,7 @@ export function Frontispiece() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1.95 }}
-              className="mt-16 flex items-center gap-4 text-mute"
+              className="mt-8 md:mt-16 flex items-center gap-4 text-mute"
             >
               <span className="block h-px w-10 bg-sepia/55" />
               <motion.span
