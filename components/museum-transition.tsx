@@ -33,10 +33,13 @@ export function MuseumTransition() {
     ],
   );
   const berlinScale = useTransform(scrollYProgress, [0.1, 1], [1.18, 1]);
+  // Fade in over [0.1, 0.25] as the iris opens; hold at 1 through the
+  // text emergence; fade back out over [0.92, 1] so the section exits
+  // smoothly into Vita instead of hard-cutting at the section boundary.
   const berlinOpacity = useTransform(
     scrollYProgress,
-    [0.1, 0.25],
-    [0, 1],
+    [0.1, 0.25, 0.92, 1],
+    [0, 1, 1, 0],
   );
 
   const textOpacity = useTransform(scrollYProgress, [0.7, 0.92], [0, 1]);

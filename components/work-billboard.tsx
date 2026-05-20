@@ -69,28 +69,11 @@ function BillboardCard({
   const isFirst = index === 0;
   const isLast = index === TOTAL - 1;
 
-  // Cards in the middle of the rotation fade in from below and out
-  // upward. The first card has nothing before it, so the fade-in would
-  // just be a "missing card" gap at the start of the section — pin it
-  // visible from progress 0. The last card has nothing after it, so the
-  // fade-out would leave an empty space at the end — pin it visible
-  // through progress 1.
-  const y = useTransform(
-    progress,
-    [
-      Math.max(0, start - fade),
-      start,
-      end - fade,
-      Math.min(1, end + fade),
-    ],
-    [
-      isFirst ? "0%" : "38%",
-      "0%",
-      "0%",
-      isLast ? "0%" : "-38%",
-    ],
-  );
-
+  // Pure opacity crossfade — billboard rotation pattern. Cards swap in
+  // place at the centre of the sticky viewport; no y-shift, so they
+  // don't drift apart vertically during the transition (which read as
+  // two cards stacked rather than one becoming the next). First and
+  // last cards stay pinned at full opacity at their edges.
   const opacity = useTransform(
     progress,
     [
@@ -109,7 +92,7 @@ function BillboardCard({
 
   return (
     <motion.div
-      style={{ y, opacity }}
+      style={{ opacity }}
       className="absolute inset-0 flex items-center justify-center pointer-events-none px-4 sm:px-8 py-20 md:py-24"
     >
       <div className="relative w-full max-w-3xl pointer-events-auto">
