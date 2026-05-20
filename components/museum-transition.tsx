@@ -5,20 +5,25 @@ import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
 /**
- * MuseumTransition — bridge between the hero and Vita. The part that the
- * user said was "perfect": elliptical curtain opens onto the Berlin photo,
- * "My name is Syed Aayan Ahmed." emerges from below.
+ * MuseumTransition — bridge between the hero and Vita. Elliptical curtain
+ * opens onto the Berlin photo, then "My name is Syed Aayan Ahmed." emerges
+ * from below.
  *
- * No bust scaling here. The hero's bust has already faded out at the end
- * of <Frontispiece/>'s 120vh; this section opens on a clean canvas.
+ * Two acts inside a sticky-pinned 180vh section:
  *
- * Two acts inside one sticky-pinned 100vh of pin scroll (180vh outer):
- *
- *   I. Curtain opens (10 → 65%). An elliptical clip-path expands from a
- *      tight low arch to full bleed, revealing the Berlin photo
- *      underneath. The theatrical iris.
- *  II. Text emerges (70 → 95%). "My name is Syed Aayan Ahmed." fades up
- *      from below the photo.
+ *   I. Iris opens — viewport-entry-triggered one-shot. As soon as the
+ *      section scrolls into view, the elliptical clip-path expands from
+ *      0% to 130% over 1.4s, revealing the photo. Decoupled from
+ *      scrollYProgress on purpose: previously the photo was gated by both
+ *      a scroll-driven clip-path AND a scroll-driven opacity, both
+ *      starting at "fully hidden". Users had to scroll deep into the
+ *      section before anything appeared, and on touch devices with
+ *      smooth-scroll, the scroll-driven values often lagged enough that
+ *      the photo never showed. Triggering off viewport entry means the
+ *      reveal plays reliably the moment the section is visible.
+ *  II. Text emerges (scroll-driven, 0.55 → 0.92). "My name is Syed Aayan
+ *      Ahmed." fades up from below. Still scroll-driven because the second
+ *      act intentionally rewards continued scrolling.
  */
 export function MuseumTransition() {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,38 +32,29 @@ export function MuseumTransition() {
     offset: ["start start", "end end"],
   });
 
-  // Iris origin matches the bridge's climax pupil position (50%, 50%) so
-  // the hand-off is pixel-aligned: the bridge ends with the eye dead-
-  // centred, the iris opens from that same point.
-  const curtainClip = useTransform(
-    scrollYProgress,
-    [0.1, 0.65],
-    [
-      "ellipse(0% 0% at 50% 50%)",
-      "ellipse(120% 130% at 50% 50%)",
-    ],
-  );
-  const berlinScale = useTransform(scrollYProgress, [0.1, 1], [1.18, 1]);
-  const berlinOpacity = useTransform(
-    scrollYProgress,
-    [0.1, 0.25],
-    [0, 1],
-  );
+  // Slight zoom-out on the photo as the user continues scrolling — subtle
+  // depth cue, NOT a visibility gate.
+  const berlinScale = useTransform(scrollYProgress, [0, 1], [1.12, 1]);
 
-  const textOpacity = useTransform(scrollYProgress, [0.7, 0.92], [0, 1]);
-  const textY = useTransform(scrollYProgress, [0.7, 1], [50, 0]);
+  const textOpacity = useTransform(scrollYProgress, [0.55, 0.88], [0, 1]);
+  const textY = useTransform(scrollYProgress, [0.55, 1], [50, 0]);
 
   return (
     <section
       ref={ref}
       className="relative w-full"
       style={{ height: "180vh" }}
-      data-cursor="Look"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-canvas">
-        {/* Berlin photo, revealed by the elliptical curtain */}
+        {/* Berlin photo, revealed by the elliptical curtain. The iris
+            animates once on viewport entry — `whileInView` with
+            `viewport.once`. Initial clipPath fully closed, animated
+            value fully open. */}
         <motion.div
-          style={{ clipPath: curtainClip, opacity: berlinOpacity }}
+          initial={{ clipPath: "ellipse(0% 0% at 50% 50%)" }}
+          whileInView={{ clipPath: "ellipse(120% 130% at 50% 50%)" }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0 z-0"
         >
           <motion.div
@@ -86,7 +82,7 @@ export function MuseumTransition() {
           </motion.div>
         </motion.div>
 
-        {/* Emerging text */}
+        {/* Emerging text — second act, still scroll-driven. */}
         <motion.div
           style={{ opacity: textOpacity, y: textY }}
           className="absolute inset-x-0 bottom-[18vh] z-20 flex justify-center px-8 pointer-events-none"
