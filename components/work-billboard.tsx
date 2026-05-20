@@ -66,7 +66,15 @@ function BillboardCard({
   const start = index / TOTAL;
   const end = (index + 1) / TOTAL;
   const fade = 0.04;
+  const isFirst = index === 0;
+  const isLast = index === TOTAL - 1;
 
+  // Cards in the middle of the rotation fade in from below and out
+  // upward. The first card has nothing before it, so the fade-in would
+  // just be a "missing card" gap at the start of the section — pin it
+  // visible from progress 0. The last card has nothing after it, so the
+  // fade-out would leave an empty space at the end — pin it visible
+  // through progress 1.
   const y = useTransform(
     progress,
     [
@@ -75,7 +83,12 @@ function BillboardCard({
       end - fade,
       Math.min(1, end + fade),
     ],
-    ["38%", "0%", "0%", "-38%"],
+    [
+      isFirst ? "0%" : "38%",
+      "0%",
+      "0%",
+      isLast ? "0%" : "-38%",
+    ],
   );
 
   const opacity = useTransform(
@@ -86,7 +99,12 @@ function BillboardCard({
       end - fade,
       Math.min(1, end + fade * 0.5),
     ],
-    [0, 1, 1, 0],
+    [
+      isFirst ? 1 : 0,
+      1,
+      1,
+      isLast ? 1 : 0,
+    ],
   );
 
   return (
